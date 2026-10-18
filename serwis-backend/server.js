@@ -49,6 +49,20 @@ app.get('/klienci', (req, res)=> {
     return res.status(200).json({lista_klientow: listaKlientow});
 })
 
+app.get('/naprawy', (req, res)=> {
+    const zapytanie = db.prepare(`
+        SELECT NAPRAWY.id AS id_naprawy,
+        NAPRAWY.nazwa_sprzetu, 
+        NAPRAWY.opis_usterki,
+        NAPRAWY.status,
+        KLIENCI.imie_nazwisko,
+        KLIENCI.nr_tel FROM NAPRAWY
+        JOIN KLIENCI ON NAPRAWY.id_klienta = KLIENCI.id
+        `);
+    const listaNapraw = zapytanie.all();
+    return res.status(200).json({lista_napraw: listaNapraw});
+})
+
 app.post('/naprawy', (req, res)=> {
     const dodajNaprawe = db.prepare(`
         INSERT INTO NAPRAWY (nazwa_sprzetu, opis_usterki, id_klienta)
@@ -69,6 +83,22 @@ app.post('/naprawy', (req, res)=> {
     catch (error) {
         return res.status(400).json({blad: "Nie znaleziono klienta o danym ID"});
     }
+})
+
+app.put('/naprawy/:id', (req, res)=> {
+    if (!req.body.status) {
+        return res.status(400).json({blad: "Brak nowego statusu"});
+    }
+    const idNaprawy = req.params.id;
+    const aktualizujStatus = db.prepare(`
+        UPDATE NAPRAWY SET status = ? WHERE id = ?
+        `);
+    const wynik = aktualizujStatus.run(req.body.status, idNaprawy);
+
+    if (wynik.changes === 0) {
+        return res.status(400).json({blad: "Nie znaleziono naprawy o podanym ID"});
+    }
+    return res.status(200).json({wiadomosc: "Status naprawy zaktualizowany"});
 })
 
 app.listen(PORT, ()=> {
