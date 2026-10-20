@@ -28,6 +28,15 @@ const tworzenie_naprawy = db.prepare(
 );
 tworzenie_naprawy.run();
 
+const tworzenieMagazyn = db.prepare(
+    `CREATE TABLE IF NOT EXISTS MAGAZYN(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nazwa_czesci TEXT NOT NULL,
+    stan_magazynowy INTEGER DEFAULT 0,
+    cena REAL
+    )`
+)
+tworzenieMagazyn.run();
 app.post('/klienci', (req, res)=>{
     if (!req.body.imie_nazwisko || !req.body.nr_tel) {
         return res.status(400).json({blad: "BRAK KOMPLETNYCH DANYCH"});
@@ -49,19 +58,7 @@ app.get('/klienci', (req, res)=> {
     return res.status(200).json({lista_klientow: listaKlientow});
 })
 
-app.get('/naprawy', (req, res)=> {
-    const zapytanie = db.prepare(`
-        SELECT NAPRAWY.id AS id_naprawy,
-        NAPRAWY.nazwa_sprzetu, 
-        NAPRAWY.opis_usterki,
-        NAPRAWY.status,
-        KLIENCI.imie_nazwisko,
-        KLIENCI.nr_tel FROM NAPRAWY
-        JOIN KLIENCI ON NAPRAWY.id_klienta = KLIENCI.id
-        `);
-    const listaNapraw = zapytanie.all();
-    return res.status(200).json({lista_napraw: listaNapraw});
-})
+
 
 app.post('/naprawy', (req, res)=> {
     const dodajNaprawe = db.prepare(`
@@ -101,6 +98,48 @@ app.put('/naprawy/:id', (req, res)=> {
     return res.status(200).json({wiadomosc: "Status naprawy zaktualizowany"});
 })
 
+app.get('/naprawy', (req, res)=> {
+    try {
+        const zapytanieNaprawy = db.prepare(
+            'SELECT naprawy.*, klienci.imie_nazwisko FROM NAPRAWY JOIN KLIENCI ON Klienci.id=Naprawy.id_klienta').all();
+            res.status(200).json({listaNapraw: zapytanieNaprawy});
+    
+        } catch (err) {
+            res.status(500).json({blad: "Blad bazy danych"});
+        }
+        })
+
+app.get('/magazyn', (req, res)=> {
+    try {
+        const zapytanieMagazyn = db.prepare(
+            'SELECT * FROM MAGAZYN'
+        ).all();
+        res.status(200).json({Magazyn: zapytanieMagazyn})
+    } catch (err) {
+        res.status(500).json({blad: "Blad bazy danych"});
+    }
+});
+
+app.post('/magazyn', (req, res)=> {
+    if (!req.body.nazwa_czesci || !req.body.stan_magazynowy || !req.body.cena) {
+        return res.status(400).json({blad: "NIEPELNE DANE"});      
+    }
+    const zapytanie = db.prepare(
+            `INSERT INTO MAGAZYN (nazwa_czesci, stan_magazynowy, cena) VALUES
+            (?, ?, ?)`
+        );
+    try {
+        const zapytanieMagazyn = zapytanie.run(req.body.nazwa_czesci, req.body.stan_magazynowy, req.body.cena);
+        res.status(201).json({Sukces: "Dodano część",
+            id_czesci: zapytanieMagazyn.lastInsertRowid
+        });
+    } catch (err) {
+        res.status(500).json({Blad: "Blad bazy danych"});
+    }
+        
+})
+
 app.listen(PORT, ()=> {
     console.log(`SERWER DZIALA NA adresie http://localhost:${PORT}`);
 });
+
