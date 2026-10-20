@@ -1,48 +1,166 @@
+/* 1. RESET ŚRODOWISKA I NOWOCZESNA CZCIONKA */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* 2. GŁÓWNY SZKIELET APLIKACJI */
 .glowny-uklad {
   height: 100vh;
   display: flex;
-  background-color: #0f172a;
+  background-color: #0f172a; /* Głęboki, nowoczesny granat */
+  overflow: hidden; /* Zapobiega pojawianiu się pasków przewijania na całym oknie */
 }
 
+/* 3. LEWY PANEL BOCZNY (Mroczny Sidebar) */
 .panel-boczny {
-  width: 260px;
+  width: 0px;
   background-color: #1e293b;
   display: flex;
   flex-direction: column;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  white-space: nowrap; /* Zapobiega łamaniu tekstu przy zwijaniu */
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3); /* Cień rzucany na prawą stronę */
+  z-index: 10;
+}
+
+.panel-boczny.otwarty {
+  width: 260px;
+}
+
+/* 4. ELEMENTY WEWNĄTRZ PANELU (Pojawiają się z opóźnieniem) */
+.panel-boczny h4 {
+  color: #38bdf8; /* Jasnoniebieski akcent (jak z Twojej inspiracji) */
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
+  padding: 24px;
+  margin-bottom: 20px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
 .panel-boczny button {
-  border: 0px;
-  background: none;
-  color: #e2e8f0;
+  background: transparent;
+  border: none;
+  color: #94a3b8; /* Zgaszony, elegancki szary */
+  text-align: left;
   cursor: pointer;
-  padding: 15px 20px;
-}
-.panel-boczny button:hover {
-  opacity: 50%;
+  padding: 14px 24px;
+  margin: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.2s ease;
 }
 
+/* Aktywacja elementów po otwarciu panelu */
+.panel-boczny.otwarty h4,
+.panel-boczny.otwarty button {
+  opacity: 1;
+  transition-delay: 0.1s;
+}
+
+.panel-boczny button:hover {
+  background-color: #334155;
+  color: #f8fafc;
+  transform: translateX(4px); /* Lekkie przesunięcie w prawo po najechaniu */
+}
+
+/* 5. GŁÓWNY OBSZAR ROBOCZY */
 .obszar-roboczy {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0; /* Zabezpiecza flexbox przed pęknięciem przy dużych tabelach */
 }
 
+/* 6. JASNY GÓRNY PASEK (Topbar) */
 .gorny-pasek {
   height: 80px;
-  background-color: white;
+  min-height: 80px; /* Blokada wysokości */
+  background-color: #ffffff;
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  padding: 0 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 5;
 }
 
+.hamburger {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #475569;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.hamburger:hover {
+  background-color: #f1f5f9;
+}
+
+/* 7. WYSZUKIWARKA I GŁÓWNY PRZYCISK */
+.akcje-gorne {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Idealny odstęp między inputem a przyciskiem */
+}
+
+.akcje-gorne input {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  color: #0f172a;
+  width: 320px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.akcje-gorne input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); /* Niebieska poświata przy pisaniu */
+}
+
+.gorny-pasek .przycisk-nowy {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background-color: #0f172a;
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.gorny-pasek .przycisk-nowy:hover {
+  background-color: #1e293b;
+}
+
+.gorny-pasek .przycisk-nowy:active {
+  transform: scale(0.97); /* Efekt fizycznego wciśnięcia przycisku */
+}
+
+/* 8. MIEJSCE NA TWOJE DANE */
 .dynamiczna-sekcja {
   flex: 1;
   padding: 40px;
-  overflow-y: auto;
+  overflow-y: auto; /* Pasek przewijania tylko tutaj */
+  color: #e2e8f0;
+}
+
+.dynamiczna-sekcja h2 {
+  color: #f8fafc;
+  font-size: 1.8rem;
+  margin-bottom: 24px;
+  font-weight: 600;
 }
