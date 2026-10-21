@@ -78,14 +78,26 @@ app.post('/naprawy', (req, res)=> {
         });
     }
     catch (error) {
-        return res.status(400).json({blad: "Nie znaleziono klienta o danym ID"});
+        return res.status(404).json({blad: "Nie znaleziono klienta o danym ID"});
     }
 })
-
+const DOZWOLONE_STATUSY = [
+    'Przyjęto',
+    'W trakcie diagnozy',
+    'Czeka na części',
+    'Gotowe',
+    'Odebrane'
+];
 app.put('/naprawy/:id', (req, res)=> {
     if (!req.body.status) {
         return res.status(400).json({blad: "Brak nowego statusu"});
     }
+    if (!DOZWOLONE_STATUSY.includes(req.body.status)) {
+        return res.status(400).json({
+                blad: "Niepoprawny status",
+                dozwolone: DOZWOLONE_STATUSY
+            });
+        }
     const idNaprawy = req.params.id;
     const aktualizujStatus = db.prepare(`
         UPDATE NAPRAWY SET status = ? WHERE id = ?
@@ -93,7 +105,7 @@ app.put('/naprawy/:id', (req, res)=> {
     const wynik = aktualizujStatus.run(req.body.status, idNaprawy);
 
     if (wynik.changes === 0) {
-        return res.status(400).json({blad: "Nie znaleziono naprawy o podanym ID"});
+        return res.status(404).json({blad: "Nie znaleziono naprawy o podanym ID"});
     }
     return res.status(200).json({wiadomosc: "Status naprawy zaktualizowany"});
 })
@@ -121,7 +133,7 @@ app.get('/magazyn', (req, res)=> {
 });
 
 app.post('/magazyn', (req, res)=> {
-    if (!req.body.nazwa_czesci || !req.body.stan_magazynowy || !req.body.cena) {
+    if (!req.body.nazwa_czesci || req.body.stan_magazynowy === undefined || req.body.cena===undefined) {
         return res.status(400).json({blad: "NIEPELNE DANE"});      
     }
     const zapytanie = db.prepare(

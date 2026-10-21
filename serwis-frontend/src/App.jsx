@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
 import PanelKlientow from "./components/PanelKlientow";
 import './App.css'
+import PanelNapraw  from "./components/PanelNapraw";
 export default function App() {
-    const [aktywnaZakladka, setAktywnaZakladka] = useState("pulpit");
+    const [aktywnaZakladka, setAktywnaZakladka] = useState(() => {
+    return localStorage.getItem("zapisanaZakladka") || "pulpit";
+});
+
+
+useEffect(() => {
+    localStorage.setItem("zapisanaZakladka", aktywnaZakladka);
+}, [aktywnaZakladka]);
     const [czyPanelOtwarty, setCzyPanelOtwarty] = useState(false);
     return (
         <div className="glowny-uklad">
@@ -23,7 +31,7 @@ export default function App() {
                 </header>
                 <section className="dynamiczna-sekcja">
                         {aktywnaZakladka === 'pulpit' && <h2>Panel Główny</h2>}
-                        {aktywnaZakladka === 'naprawy' && <h2>Naprawy</h2>}                    
+                        {aktywnaZakladka === 'naprawy' && <PanelNapraw/>}                    
                         {aktywnaZakladka === 'klienci' && <PanelKlientow/>}
                         {aktywnaZakladka === 'magazyn' && <h2>Magazyn</h2>}
                 </section>
