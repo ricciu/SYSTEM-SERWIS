@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import styles from './PanelNapraw.module.css';
+import { useNavigate } from "react-router-dom";
 export default function PanelNapraw() {
     const [listaNapraw, setListaNapraw] = useState([]);
+    const [aktywnyFiltr, setAktywnyFiltr] = useState("Wszystkie");
+    const nawiguj = useNavigate();
     useEffect(()=> {
         const pobierzNaprawy = async ()=> {
             try {
@@ -19,6 +22,9 @@ export default function PanelNapraw() {
     const wTrakcie = listaNapraw.filter(naprawa=>naprawa.status==='W trakcie diagnozy' || naprawa.status ==='Czeka na części').length;
     const przyjete = listaNapraw.filter(naprawa=>naprawa.status==='Przyjęto').length;
     const gotowe = listaNapraw.filter(naprawa=>naprawa.status==='Gotowe').length;
+   
+    const wyswietlaneNaprawy = (aktywnyFiltr==='Wszystkie' ? listaNapraw : listaNapraw.filter(naprawa=>naprawa.status===aktywnyFiltr));
+
     return (
         <div className={styles.widokNapraw}>
             <header className={styles.naglowekGorny}>
@@ -49,11 +55,11 @@ export default function PanelNapraw() {
 
             <div className={styles.panelTabela}>
                 <div className={styles.przyciskiStatusow}>
-                    <button className={styles.aktywny}>Wszystkie</button>
-                    <button>Przyjęte</button>
-                    <button>W naprawie</button>
-                    <button>Oczekujące</button>
-                    <button>Gotowe</button>
+                    <button onClick={()=>setAktywnyFiltr('Wszystkie')} className={aktywnyFiltr==='Wszystkie' ? styles.aktywny : ''}>Wszystkie</button>
+                    <button onClick={()=>setAktywnyFiltr('Przyjęto')} className={aktywnyFiltr==='Przyjęto' ? styles.aktywny: ''}>Przyjęte</button>
+                    <button onClick={()=>setAktywnyFiltr('W trakcie diagnozy')} className={aktywnyFiltr==='W trakcie diagnozy' ? styles.aktywny : ''}>W naprawie</button>
+                    <button onClick={()=>setAktywnyFiltr('Czeka na części')} className={aktywnyFiltr==='Czeka na części' ? styles.aktywny : ''}>Oczekujące</button>
+                    <button onClick={()=>setAktywnyFiltr('Gotowe')} className={aktywnyFiltr === 'Gotowe' ? styles.aktywny : ''}>Gotowe</button>
                 </div>
                 
                 <div className={styles.tabelaDanych}>
@@ -68,7 +74,7 @@ export default function PanelNapraw() {
                             </tr>
                         </thead>
                         <tbody>
-                            {listaNapraw.map((naprawa)=> (
+                            {wyswietlaneNaprawy.map((naprawa)=> (
                                 <tr key={naprawa.id}>
                                     <td>RIC-{naprawa.id}</td>
                                     
@@ -76,11 +82,11 @@ export default function PanelNapraw() {
                                     {naprawa.nazwa_sprzetu}
                                     </td>
                                     <td className={styles.imieInicjaly}>
-                                        <div className={styles.inicjaly}>K</div>
+                                        <div className={styles.inicjaly}>{naprawa.imie_nazwisko[0]}</div>
                                         <span className={styles.Imie}>{naprawa.imie_nazwisko}</span>
                                     </td>
                                     <td><span className={styles.status}>{naprawa.status}</span></td>
-                                    <td><button className={styles.szczegoly}>Szczegóły</button></td>
+                                    <td><button className={styles.szczegoly} onClick={()=>nawiguj(`/naprawa/${naprawa.id}`)}>Szczegóły</button></td>
                                 </tr>
                             )
                             )}
