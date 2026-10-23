@@ -121,6 +121,17 @@ app.get('/naprawy', (req, res)=> {
         }
         })
 
+app.get('/naprawy/:id', (req, res)=> {
+    const idNaprawy = req.params.id;
+    try {
+        const zapytanie = db.prepare('SELECT Naprawy.*, Klienci.imie_nazwisko, Klienci.nr_tel FROM Naprawy JOIN Klienci ON Klienci.id = Naprawy.id_klienta WHERE Naprawy.id= ?');
+        const szczegolyNaprawy = zapytanie.get(idNaprawy);
+        return res.status(200).json({szczegolyNaprawy: szczegolyNaprawy});
+    } catch (err) {
+        res.status(500).json({blad: "Blad  bazy danych"});
+    }
+})
+
 app.get('/magazyn', (req, res)=> {
     try {
         const zapytanieMagazyn = db.prepare(

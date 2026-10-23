@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import styles from './SzczegolyNapraw.module.css';
 export default function SzczegolyNaprawy() {
     const { id } = useParams();
     const nawiguj = useNavigate();
@@ -10,7 +10,7 @@ export default function SzczegolyNaprawy() {
         try {
             const odpowiedz = await fetch(`http://localhost:3000/naprawy/${id}`);
             const dane = await odpowiedz.json();
-            setSzczegoly(dane);
+            setSzczegoly(dane.szczegolyNaprawy);
         } catch (err) {
             console.error("BLAD API");
         }
@@ -22,11 +22,14 @@ export default function SzczegolyNaprawy() {
          return <div>Wczytywanie danych zgłoszenia...</div>   
         }
     return (
-        
-        <div>
-            <button onClick={()=>nawiguj('/naprawy')}>← Wróć do listy</button>
-            <h2>Karta naprawy nr: {id}</h2>
-            <h3>{szczegoly.nazwa_sprzetu}</h3>
-        </div>
+       <div className={styles.szczegolyNaprawy}>
+            <header className={styles.infoNaprawa}>
+                <span className={styles.idNaprawy}>RIC-{szczegoly.id}</span>
+                <span className={styles.statusNaprawy}>{szczegoly.status}</span>
+                <span className={styles.nazwaSprzetu}>{szczegoly.nazwa_sprzetu}</span>
+                <span className={styles.opisUsterki}>{szczegoly.opis_usterki}</span>
+                <button onClick={()=>nawiguj('/naprawy')}>X</button>
+            </header>
+       </div>
     );
 }
