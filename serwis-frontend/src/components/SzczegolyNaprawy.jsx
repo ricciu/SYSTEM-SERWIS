@@ -24,12 +24,39 @@ export default function SzczegolyNaprawy() {
     return (
        <div className={styles.szczegolyNaprawy}>
             <header className={styles.infoNaprawa}>
-                <span className={styles.idNaprawy}>RIC-{szczegoly.id}</span>
-                <span className={styles.statusNaprawy}>{szczegoly.status}</span>
-                <span className={styles.nazwaSprzetu}>{szczegoly.nazwa_sprzetu}</span>
-                <span className={styles.opisUsterki}>{szczegoly.opis_usterki}</span>
-                <button onClick={()=>nawiguj('/naprawy')}>X</button>
+                <div className={styles.status}><span>RIC-{szczegoly.id}</span><span>{szczegoly.status}</span><button className={styles.btnZamknij} onClick={()=>nawiguj('/naprawy')}>X</button></div>
+                <h1>{szczegoly.nazwa_sprzetu}</h1>
+                <p>{szczegoly.opis_usterki}</p>
             </header>
+            <section className={styles.obszarRoboczy}>
+              <div className={styles.wierszKart}>  
+                <div className={styles.kartaKlienta}>
+                    <span>KLIENT</span>
+                    <div className={styles.profilKlienta}>
+                    <div className={styles.inicjaly}>{szczegoly.imie_nazwisko[0]}</div>
+                    <div className={styles.daneKlienta}>
+                        <strong>{szczegoly.imie_nazwisko}</strong>
+                        <p>{szczegoly.nr_tel}</p>
+                    </div>
+                    </div>
+                </div>
+                <div className={styles.planowanyTermin}>
+                    <span>PLANOWANY TERMIN </span>
+                    <strong>Brak danych</strong>
+                </div>
+              </div>
+                <article className={styles.infUrzadzenie}>
+                    <h3>Informacje o urządzeniu</h3>
+                    <p>{szczegoly.opis_usterki}</p>
+                </article>
+                <article className={styles.kosztorys}>
+                    <h3>Kosztorys</h3>
+                </article>
+            </section>
+            <footer>
+                <button className={styles.kontaktKlient}>Kontakt z klientem</button>
+                <button className={styles.zmienStatus}>Zmień status</button>
+            </footer>
        </div>
     );
 }

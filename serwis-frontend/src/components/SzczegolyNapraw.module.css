@@ -1,0 +1,93 @@
+.szczegolyNaprawy {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0f172a;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    color: #f8fafc;
+}
+
+.obszarRoboczy {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+footer {
+    background-color: #1e293b;
+    padding: 20px;
+    border-top: 1px solid #334155;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.kontaktKlient, .zmienStatus {
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.zmienStatus {
+    background-color: #3b82f6;
+}
+
+.kartaKlienta, .planowanyTermin, .infUrzadzenie, .kosztorys {
+    background-color: #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.infoNaprawa {
+    padding: 20px;
+    border-bottom: 1px solid #334155;
+}
+
+.status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wierszKart {
+    display: flex;
+    gap: 20px;
+}
+
+.kartaKlienta, .planowanyTermin {
+    flex: 1;
+}
+
+.profilKlienta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 12px;
+}
+
+.inicjaly {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #3b82f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.kartaKlienta > span, .planowanyTermin > span {
+    display: block;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
