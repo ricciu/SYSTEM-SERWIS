@@ -5,18 +5,24 @@ export default function SzczegolyNaprawy() {
     const { id } = useParams();
     const nawiguj = useNavigate();
     const [szczegoly, setSzczegoly] = useState(null);
+    const [czyKosztyOtwarte, setCzyKosztyOtwarte] = useState(false);
+    const [listaCzesci, setListaCzesci] = useState([]);
     useEffect(() => {
-    const pobierzSzczegoly = async () => {
+    const pobierzDane = async () => {
         try {
-            const odpowiedz = await fetch(`http://localhost:3000/naprawy/${id}`);
-            const dane = await odpowiedz.json();
-            setSzczegoly(dane.szczegolyNaprawy);
+            const odpowiedzNaprawa = await fetch(`http://localhost:3000/naprawy/${id}`);
+            const daneNaprawa = await odpowiedzNaprawa.json();
+            setSzczegoly(daneNaprawa.szczegolyNaprawy);
+
+            const odpowiedzMagazyn = await fetch(`http://localhost:3000/magazyn`);
+            const daneMagazyn = await odpowiedzMagazyn.json();
+            setListaCzesci(daneMagazyn.Magazyn);
         } catch (err) {
             console.error("BLAD API");
         }
     };
     
-    pobierzSzczegoly();
+    pobierzDane();
 }, [id]);
     if (szczegoly === null) {
          return <div>Wczytywanie danych zgłoszenia...</div>   
@@ -24,7 +30,7 @@ export default function SzczegolyNaprawy() {
     return (
        <div className={styles.szczegolyNaprawy}>
             <header className={styles.infoNaprawa}>
-                <div className={styles.status}><span className={styles.id}>RIC-{szczegoly.id}</span><span>{szczegoly.status}</span><button className={styles.btnZamknij} onClick={()=>nawiguj('/naprawy')}>X</button></div>
+                <div className={styles.status}><span className={styles.id}>RIC-{szczegoly.id}</span><span className={styles.pigulkaStatusu}>{szczegoly.status}</span><button className={styles.btnZamknij} onClick={()=>nawiguj('/naprawy')}>X</button></div>
                 <h1>{szczegoly.nazwa_sprzetu}</h1>
                 <p>{szczegoly.opis_usterki}</p>
             </header>
@@ -50,13 +56,44 @@ export default function SzczegolyNaprawy() {
                     <p>{szczegoly.opis_usterki}</p>
                 </article>
                 <article className={styles.kosztorys}>
-                    <h3>Kosztorys</h3>
+                    <div className={styles.kosztorysNaglowek}>
+                        <h3>Kosztorys</h3>
+                        <button className={styles.btnDodajKoszt}
+                        onClick={()=>setCzyKosztyOtwarte(true)}>
+                            + Dodaj koszt
+                        </button>
+                    </div>
+                    
                 </article>
             </section>
             <footer>
                 <button className={styles.kontaktKlient}>Kontakt z klientem</button>
                 <button className={styles.zmienStatus}>Zmień status</button>
             </footer>
+            {czyKosztyOtwarte && (
+                <div className={styles.malyModalTlo}>
+                    <div className={styles.malyModal}>
+                        <h3>Wybierz część / usługę</h3>
+                        <select className={styles.wyborCzesci}>
+                            <option value="">Wybierz z magazynu...</option>
+                            {listaCzesci.map((czesc)=>(
+                                <option key={czesc.id} value={czesc.id}>
+                                    {czesc.nazwa_czesci} ({czesc.cena} zł)
+                                </option>
+                            ))}
+                        </select>
+                    
+                    <div className={styles.malyModalAkcje}>
+                        <button className={styles.btnAnuluj} onClick={()=>setCzyKosztyOtwarte(false)}>
+                            Anuluj
+                        </button>
+                        <button className={styles.btnZapiszKoszt}>
+                            Dodaj do wyceny
+                        </button>
+                    </div>
+                    </div>
+                </div>
+            )}
        </div>
     );
 }

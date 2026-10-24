@@ -102,6 +102,11 @@ footer {
     font-size: 1.5rem;
     color: gray;
     cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btnZamknij:hover {
+    color: #f8fafc;
 }
 
 .kontaktKlient {
@@ -114,4 +119,87 @@ footer {
     border: none;
     color: lightgray;
     font-weight: 600;
+}
+
+.pigulkaStatusu {
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 90%;
+    background-color: rgba(56, 189, 248, 0.15);
+}
+
+.kosztorysNaglowek {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.btnDodajKoszt {
+    background-color: #38bdf8;
+    color: #0f172a;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.malyModalTlo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.malyModal {
+    background-color: #1e293b;
+    padding: 25px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 1px solid #334155;
+}
+
+.wyborCzesci {
+    width: 100%;
+    padding: 10px;
+    margin: 20px 0;
+    background-color: #0f172a;
+    color: #f8fafc;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.malyModalAkcje {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btnAnuluj {
+    background: transparent;
+    border: 1px solid #475569;
+    color: lightgray;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btnZapiszKoszt {
+    background-color: #38bdf8;
+    color: #0f172a;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
 }

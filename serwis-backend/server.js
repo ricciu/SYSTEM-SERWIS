@@ -37,6 +37,17 @@ const tworzenieMagazyn = db.prepare(
     )`
 )
 tworzenieMagazyn.run();
+const sprawdzMagazyn = db.prepare('SELECT COUNT(*) as count FROM Magazyn');
+if (sprawdzMagazyn.count===0) {
+    const dodajCzesc = db.prepare('INSERT INTO MAGAZYN (nazwa_czesci, stan_magazynowy, cena) VALUES (?, ?, ?)');
+    const wstawStartowe = db.transaction(()=> {
+        dodajCzesc.run('Wymiana matrycy', 10, 350.0);
+        dodajCzesc.run('Czyszczenie układu chłodzenia', 15, 120.0);
+        dodajCzesc.run('Wymiana baterii', 20, 150.0);
+        dodajCzesc.run('Diagnoza', 999, 50.00);
+    });
+    wstawStartowe();
+}
 app.post('/klienci', (req, res)=>{
     if (!req.body.imie_nazwisko || !req.body.nr_tel) {
         return res.status(400).json({blad: "BRAK KOMPLETNYCH DANYCH"});
