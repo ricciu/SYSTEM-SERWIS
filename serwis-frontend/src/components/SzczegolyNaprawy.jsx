@@ -24,7 +24,7 @@ export default function SzczegolyNaprawy() {
     return (
        <div className={styles.szczegolyNaprawy}>
             <header className={styles.infoNaprawa}>
-                <div className={styles.status}><span>RIC-{szczegoly.id}</span><span>{szczegoly.status}</span><button className={styles.btnZamknij} onClick={()=>nawiguj('/naprawy')}>X</button></div>
+                <div className={styles.status}><span className={styles.id}>RIC-{szczegoly.id}</span><span>{szczegoly.status}</span><button className={styles.btnZamknij} onClick={()=>nawiguj('/naprawy')}>X</button></div>
                 <h1>{szczegoly.nazwa_sprzetu}</h1>
                 <p>{szczegoly.opis_usterki}</p>
             </header>
