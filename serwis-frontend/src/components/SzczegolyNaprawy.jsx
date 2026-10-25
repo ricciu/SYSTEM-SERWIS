@@ -7,16 +7,21 @@ export default function SzczegolyNaprawy() {
     const [szczegoly, setSzczegoly] = useState(null);
     const [czyKosztyOtwarte, setCzyKosztyOtwarte] = useState(false);
     const [listaCzesci, setListaCzesci] = useState([]);
+    const [wybranaCzesc, setWybranaCzesc] = useState("");
+    const [dodaneKoszty, setDodaneKoszty] = useState([]);
     useEffect(() => {
     const pobierzDane = async () => {
         try {
             const odpowiedzNaprawa = await fetch(`http://localhost:3000/naprawy/${id}`);
             const daneNaprawa = await odpowiedzNaprawa.json();
             setSzczegoly(daneNaprawa.szczegolyNaprawy);
+            setDodaneKoszty(daneNaprawa.kosztorys);
 
             const odpowiedzMagazyn = await fetch(`http://localhost:3000/magazyn`);
             const daneMagazyn = await odpowiedzMagazyn.json();
             setListaCzesci(daneMagazyn.Magazyn);
+
+        
         } catch (err) {
             console.error("BLAD API");
         }
@@ -27,6 +32,29 @@ export default function SzczegolyNaprawy() {
     if (szczegoly === null) {
          return <div>Wczytywanie danych zgłoszenia...</div>   
         }
+    const dodajKosztDoListy = async () => {
+        try {
+            const dodajKoszt = await fetch('http://localhost:3000/kosztorys',
+                {method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    id_zlecenia: id,
+                    id_czesci: wybranaCzesc
+                }
+            )
+        });
+            if (dodajKoszt.ok) {
+                setCzyKosztyOtwarte(false);
+                setWybranaCzesc("");
+                const znalezionaCzesc = listaCzesci.find(czesc => czesc.id.toString() === wybranaCzesc.toString());
+                setDodaneKoszty([...dodaneKoszty, znalezionaCzesc]);
+            }
+        }
+        catch (err) {
+            console.error("BLAD SIECI", err);
+            alert("NIE UDALO SIE ZAPISAC KOSZTU");
+        }
+    };       
     return (
        <div className={styles.szczegolyNaprawy}>
             <header className={styles.infoNaprawa}>
@@ -63,7 +91,11 @@ export default function SzczegolyNaprawy() {
                             + Dodaj koszt
                         </button>
                     </div>
-                    
+                    {dodaneKoszty.map((koszt, index)=>(
+                                <p key={index}>
+                                    {koszt.nazwa_czesci} ({koszt.cena} zł)
+                                </p>
+                            ))}
                 </article>
             </section>
             <footer>
@@ -74,7 +106,7 @@ export default function SzczegolyNaprawy() {
                 <div className={styles.malyModalTlo}>
                     <div className={styles.malyModal}>
                         <h3>Wybierz część / usługę</h3>
-                        <select className={styles.wyborCzesci}>
+                        <select className={styles.wyborCzesci} value={wybranaCzesc} onChange={(e)=>setWybranaCzesc(e.target.value)}>
                             <option value="">Wybierz z magazynu...</option>
                             {listaCzesci.map((czesc)=>(
                                 <option key={czesc.id} value={czesc.id}>
@@ -87,7 +119,7 @@ export default function SzczegolyNaprawy() {
                         <button className={styles.btnAnuluj} onClick={()=>setCzyKosztyOtwarte(false)}>
                             Anuluj
                         </button>
-                        <button className={styles.btnZapiszKoszt}>
+                        <button className={styles.btnZapiszKoszt} onClick={dodajKosztDoListy}>
                             Dodaj do wyceny
                         </button>
                     </div>
