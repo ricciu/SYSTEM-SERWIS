@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import styles from './SzczegolyNapraw.module.css';
+import {FaWrench, FaCoins} from "react-icons/fa";
 export default function SzczegolyNaprawy() {
     const { id } = useParams();
     const nawiguj = useNavigate();
