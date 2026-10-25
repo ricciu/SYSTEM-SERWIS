@@ -9,6 +9,7 @@ export default function SzczegolyNaprawy() {
     const [listaCzesci, setListaCzesci] = useState([]);
     const [wybranaCzesc, setWybranaCzesc] = useState("");
     const [dodaneKoszty, setDodaneKoszty] = useState([]);
+    const [wpisanaCena, setWpisanaCena] = useState("");
     useEffect(() => {
     const pobierzDane = async () => {
         try {
@@ -39,22 +40,26 @@ export default function SzczegolyNaprawy() {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     id_zlecenia: id,
-                    id_czesci: wybranaCzesc
+                    id_czesci: wybranaCzesc,
+                    cena: wpisanaCena
                 }
             )
         });
             if (dodajKoszt.ok) {
                 setCzyKosztyOtwarte(false);
                 setWybranaCzesc("");
+                setWpisanaCena("");
                 const znalezionaCzesc = listaCzesci.find(czesc => czesc.id.toString() === wybranaCzesc.toString());
-                setDodaneKoszty([...dodaneKoszty, znalezionaCzesc]);
+                const nowyKoszt = {...znalezionaCzesc, cena: wpisanaCena};
+                setDodaneKoszty([...dodaneKoszty, nowyKoszt]);
             }
         }
         catch (err) {
             console.error("BLAD SIECI", err);
             alert("NIE UDALO SIE ZAPISAC KOSZTU");
         }
-    };       
+    };  
+    const sumaKosztow = dodaneKoszty.reduce((suma, koszt)=>suma + Number(koszt.cena), 0);     
     return (
        <div className={styles.szczegolyNaprawy}>
             <header className={styles.infoNaprawa}>
@@ -96,6 +101,9 @@ export default function SzczegolyNaprawy() {
                                     {koszt.nazwa_czesci} ({koszt.cena} zł)
                                 </p>
                             ))}
+                    <div className={styles.podsumowanieKosztow}>
+                        <strong>RAZEM: {sumaKosztow} zł</strong>
+                    </div>
                 </article>
             </section>
             <footer>
@@ -107,13 +115,21 @@ export default function SzczegolyNaprawy() {
                     <div className={styles.malyModal}>
                         <h3>Wybierz część / usługę</h3>
                         <select className={styles.wyborCzesci} value={wybranaCzesc} onChange={(e)=>setWybranaCzesc(e.target.value)}>
+                            
                             <option value="">Wybierz z magazynu...</option>
                             {listaCzesci.map((czesc)=>(
                                 <option key={czesc.id} value={czesc.id}>
-                                    {czesc.nazwa_czesci} ({czesc.cena} zł)
+                                    {czesc.nazwa_czesci}
                                 </option>
                             ))}
                         </select>
+                        <input 
+                                type="number"
+                                placeholder="Wpisz cenę..."
+                                value={wpisanaCena}
+                                onChange={(e)=>setWpisanaCena(e.target.value)}
+                                className={styles.inputCeny}
+                            />
                     
                     <div className={styles.malyModalAkcje}>
                         <button className={styles.btnAnuluj} onClick={()=>setCzyKosztyOtwarte(false)}>

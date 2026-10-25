@@ -43,6 +43,7 @@ const tworzenieKosztorys = db.prepare(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_zlecenia INTEGER NOT NULL,
     id_czesci INTEGER NOT NULL,
+    cena_koncowa NUMERIC NOT NULL,
     FOREIGN KEY (id_zlecenia) REFERENCES naprawy(id),
     FOREIGN KEY (id_czesci) REFERENCES magazyn(id)
     )`
@@ -150,7 +151,7 @@ app.get('/naprawy/:id', (req, res)=> {
         const zapytanie = db.prepare('SELECT Naprawy.*, Klienci.imie_nazwisko, Klienci.nr_tel FROM Naprawy JOIN Klienci ON Klienci.id = Naprawy.id_klienta WHERE Naprawy.id= ?');
         const szczegolyNaprawy = zapytanie.get(idNaprawy);
 
-        const zapytanieKosztorys = db.prepare(`SELECT Magazyn.nazwa_czesci, Magazyn.cena FROM Magazyn JOIN Kosztorys ON Magazyn.id=Kosztorys.id_czesci WHERE Kosztorys.id_zlecenia=?
+        const zapytanieKosztorys = db.prepare(`SELECT Magazyn.nazwa_czesci, Kosztorys.cena_koncowa AS cena FROM Magazyn JOIN Kosztorys ON Magazyn.id=Kosztorys.id_czesci WHERE Kosztorys.id_zlecenia=?
 `).all(idNaprawy);
         
         return res.status(200).json({szczegolyNaprawy: szczegolyNaprawy, kosztorys: zapytanieKosztorys});
@@ -193,9 +194,10 @@ app.post('/kosztorys', (req, res)=>{
     try {
         const id_zlecenia = req.body.id_zlecenia;
         const id_czesci = req.body.id_czesci;
-        const zapytanie = db.prepare(`INSERT INTO KOSZTORYS (id_zlecenia, id_czesci) VALUES
-    (?, ?)`);
-        const zapytanieKosztorys = zapytanie.run(id_zlecenia, id_czesci);
+        const cena = req.body.cena;
+        const zapytanie = db.prepare(`INSERT INTO KOSZTORYS (id_zlecenia, id_czesci, cena_koncowa) VALUES
+    (?, ?, ?)`);
+        const zapytanieKosztorys = zapytanie.run(id_zlecenia, id_czesci, cena);
         res.status(201).json({Sukces: "Dodano kosztorys", id_kosztorysu: zapytanieKosztorys.lastInsertRowid })
     }
     catch (err) {
