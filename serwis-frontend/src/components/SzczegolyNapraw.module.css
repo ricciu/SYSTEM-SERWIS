@@ -128,22 +128,7 @@ footer {
     background-color: rgba(56, 189, 248, 0.15);
 }
 
-.kosztorysNaglowek {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
 
-.btnDodajKoszt {
-    background-color: #38bdf8;
-    color: #0f172a;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-}
 
 .malyModalTlo {
     position: fixed;
@@ -168,7 +153,7 @@ footer {
     border: 1px solid #334155;
 }
 
-.wyborCzesci {
+.wyborCzesci, .inputCeny {
     width: 100%;
     padding: 10px;
     margin: 20px 0;
@@ -185,7 +170,7 @@ footer {
     gap: 10px;
 }
 
-.btnAnuluj {
+.btnAnuluj, .btnZapiszKoszt {
     background: transparent;
     border: 1px solid #475569;
     color: lightgray;
@@ -195,11 +180,154 @@ footer {
 }
 
 .btnZapiszKoszt {
-    background-color: #38bdf8;
-    color: #0f172a;
+    background-color: #3b82f6;
+}
+
+
+.kosztorys {
+    border: 1px solid rgba(255,255,255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    color: #f3f4f6;
+}
+
+.kosztorysNaglowek {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.kosztorysNaglowek h3 {
+    margin: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+
+.ikonaNaglowka {
+    color: #94a3b8;
+    font-size: 20px;
+}
+
+.btnDodajKoszt {
+    background: none;
+    color: #059669;
     border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 600;
+    font-weight: 500;
+    font-size: 15px;
     cursor: pointer;
+    padding: 0;
+}
+
+.wierszKosztu {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-size: 15px;
+}
+
+.nazwaCzesci {
+    color: #CDC2EB;
+}
+
+.cenaCzesci {
+    color: #e2e8f0;
+    font-weight: 500;
+}
+
+.podzielnik {
+    height: 1px;
+    background-color: #f7fafc;
+    margin: 24px 0 16px 0;
+}
+
+.podsumowanieKosztow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.etykietaLacznie {
+    font-size: 13px;
+    color: #a0aec0;
+}
+
+.kwotaLacznie strong {
+    font-size: 24px;
+    color: #f8fafc;
+    font-weight: 700;
+}
+
+.infoVat {
+    font-size: 12px;
+    color: #a0aec0;
+    padding-bottom: 4px;
+}
+
+.kwotaLacznie {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.glownaSekcjaNaglowka {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.daneSprzetu h1 {
+    margin: 0 0 5px 0;
+}
+
+.daneSprzetu p {
+    margin: 0;
+    color: #94a3b8;
+}
+
+.wielkaKwotaDoZaplaty {
+    background-color: #10b981;
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4); 
+}
+
+.etykietaWielkaKwota {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    margin-bottom: 2px;
+}
+
+.wielkaKwotaDoZaplaty strong {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.inputCeny:focus {
+    border-color: #3b82f6; 
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); 
+}
+
+
+.inputCeny::placeholder {
+    color: #64748b;
+}
+
+
+.inputCeny::-webkit-outer-spin-button,
+.inputCeny::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }

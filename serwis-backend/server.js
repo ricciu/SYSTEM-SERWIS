@@ -151,7 +151,7 @@ app.get('/naprawy/:id', (req, res)=> {
         const zapytanie = db.prepare('SELECT Naprawy.*, Klienci.imie_nazwisko, Klienci.nr_tel FROM Naprawy JOIN Klienci ON Klienci.id = Naprawy.id_klienta WHERE Naprawy.id= ?');
         const szczegolyNaprawy = zapytanie.get(idNaprawy);
 
-        const zapytanieKosztorys = db.prepare(`SELECT Magazyn.nazwa_czesci, Kosztorys.cena_koncowa AS cena FROM Magazyn JOIN Kosztorys ON Magazyn.id=Kosztorys.id_czesci WHERE Kosztorys.id_zlecenia=?
+        const zapytanieKosztorys = db.prepare(`SELECT Kosztorys.id AS id_kosztorysu, Magazyn.nazwa_czesci, Kosztorys.cena_koncowa AS cena FROM Magazyn JOIN Kosztorys ON Magazyn.id=Kosztorys.id_czesci WHERE Kosztorys.id_zlecenia=?
 `).all(idNaprawy);
         
         return res.status(200).json({szczegolyNaprawy: szczegolyNaprawy, kosztorys: zapytanieKosztorys});
@@ -205,7 +205,30 @@ app.post('/kosztorys', (req, res)=>{
     }
 })
 
+app.delete('/kosztorys/:id', (req, res)=> {
+    try {
+        const idDoUsuniecia = req.params.id;
+        const zapytanie = db.prepare('DELETE FROM Kosztorys WHERE id = ?');
+        const usuniecie = zapytanie.run(idDoUsuniecia);
+        res.status(201).json({Sukces: "Poprawnie usunieto wiersz"});
+    }   
+    catch (err) {
+        res.status(500).json({Blad: "Blad usuwania wiersza"});
+    } 
+});
 
+app.put('/kosztorys/:id', (req, res)=> {
+    try {
+        const nowaCena = req.body.cena;
+        const idDoUsuniecia = req.params.id;
+        const zapytanie = db.prepare('UPDATE KOSZTORYS SET cena_koncowa = ? WHERE id = ?')
+        const aktualizacja = zapytanie.run(nowaCena, idDoUsuniecia)
+        res.status(201).json({Sukces: "Pomyslnie zaktualizowano rekord"});
+    }
+    catch (err) {
+        res.status(500).json({Blad: "Blad aktualizacji"});
+    }
+})
 
 app.listen(PORT, ()=> {
     console.log(`SERWER DZIALA NA adresie http://localhost:${PORT}`);

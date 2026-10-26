@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import styles from './SzczegolyNapraw.module.css';
-import {FaWrench, FaCoins} from "react-icons/fa";
+import { FiTool, FiCreditCard } from "react-icons/fi";
 export default function SzczegolyNaprawy() {
     const { id } = useParams();
     const nawiguj = useNavigate();
@@ -47,11 +47,15 @@ export default function SzczegolyNaprawy() {
             )
         });
             if (dodajKoszt.ok) {
+                const odpowiedzSerwera = await dodajKoszt.json();
                 setCzyKosztyOtwarte(false);
                 setWybranaCzesc("");
                 setWpisanaCena("");
                 const znalezionaCzesc = listaCzesci.find(czesc => czesc.id.toString() === wybranaCzesc.toString());
-                const nowyKoszt = {...znalezionaCzesc, cena: wpisanaCena};
+               
+                const nowyKoszt = {...znalezionaCzesc, cena: wpisanaCena, 
+                    id_kosztorysu: odpowiedzSerwera.id_kosztorysu
+                };
                 setDodaneKoszty([...dodaneKoszty, nowyKoszt]);
             }
         }
@@ -64,10 +68,22 @@ export default function SzczegolyNaprawy() {
     return (
        <div className={styles.szczegolyNaprawy}>
             <header className={styles.infoNaprawa}>
-                <div className={styles.status}><span className={styles.id}>RIC-{szczegoly.id}</span><span className={styles.pigulkaStatusu}>{szczegoly.status}</span><button className={styles.btnZamknij} onClick={()=>nawiguj('/naprawy')}>X</button></div>
-                <h1>{szczegoly.nazwa_sprzetu}</h1>
-                <p>{szczegoly.opis_usterki}</p>
-            </header>
+    <div className={styles.status}>
+        <span className={styles.id}>RIC-{szczegoly.id}</span>
+        <span className={styles.pigulkaStatusu}>{szczegoly.status}</span>
+        <button className={styles.btnZamknij} onClick={() => nawiguj('/naprawy')}>X</button>
+    </div>
+    <div className={styles.glownaSekcjaNaglowka}>
+        <div className={styles.daneSprzetu}>
+            <h1>{szczegoly.nazwa_sprzetu}</h1>
+            <p>{szczegoly.opis_usterki}</p>
+        </div>
+        <div className={styles.wielkaKwotaDoZaplaty}>
+            <span className={styles.etykietaWielkaKwota}>Do zapłaty</span>
+            <strong>{sumaKosztow.toFixed(2).replace('.', ',')} zł</strong>
+        </div>
+    </div>
+</header>
             <section className={styles.obszarRoboczy}>
               <div className={styles.wierszKart}>  
                 <div className={styles.kartaKlienta}>
@@ -91,19 +107,29 @@ export default function SzczegolyNaprawy() {
                 </article>
                 <article className={styles.kosztorys}>
                     <div className={styles.kosztorysNaglowek}>
-                        <h3>Kosztorys</h3>
+                        <h3><FiCreditCard className={styles.ikonaNaglowka}/>  Kosztorys</h3>
                         <button className={styles.btnDodajKoszt}
                         onClick={()=>setCzyKosztyOtwarte(true)}>
-                            + Dodaj koszt
+                            + Dodaj
                         </button>
                     </div>
-                    {dodaneKoszty.map((koszt, index)=>(
-                                <p key={index}>
-                                    {koszt.nazwa_czesci} ({koszt.cena} zł)
-                                </p>
-                            ))}
+                    <div className={styles.listaKosztowContainer}>
+                        {dodaneKoszty.map((koszt, index)=> (
+                            <div key={index} className={styles.wierszKosztu}>
+                                <span className={styles.nazwaCzesci}>{koszt.nazwa_czesci}</span>
+                                <span className={styles.cenaCzesci}>
+                                    {Number(koszt.cena).toFixed(2).replace('.', ',')}zł
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                    <div className={styles.podzielnik}></div>
                     <div className={styles.podsumowanieKosztow}>
-                        <strong>RAZEM: {sumaKosztow} zł</strong>
+                    <div className={styles.kwotaLacznie}>
+                        <span className={styles.etykietaLacznie}>Łącznie brutto</span>
+                        <strong>{sumaKosztow.toFixed(2).replace('.', ',')}zł</strong>
+                    </div>
+                    <span className={styles.infoVat}>VAT 23% wliczony</span>
                     </div>
                 </article>
             </section>
