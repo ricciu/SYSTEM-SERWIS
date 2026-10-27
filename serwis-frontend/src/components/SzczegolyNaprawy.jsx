@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import styles from './SzczegolyNapraw.module.css';
-import { FiTool, FiCreditCard } from "react-icons/fi";
+import { FiTool, FiCreditCard, FiEdit2, FiTrash } from "react-icons/fi";
 export default function SzczegolyNaprawy() {
     const { id } = useParams();
     const nawiguj = useNavigate();
@@ -11,6 +11,9 @@ export default function SzczegolyNaprawy() {
     const [wybranaCzesc, setWybranaCzesc] = useState("");
     const [dodaneKoszty, setDodaneKoszty] = useState([]);
     const [wpisanaCena, setWpisanaCena] = useState("");
+    const [kosztDoUsuniecia, setKosztDoUsuniecia] = useState(null);
+    const [kosztDoEdycji, setKosztDoEdycji] = useState(null);
+    const [nowaCenaEdycji, setNowaCenaEdycji] = useState("");
     useEffect(() => {
     const pobierzDane = async () => {
         try {
@@ -63,7 +66,41 @@ export default function SzczegolyNaprawy() {
             console.error("BLAD SIECI", err);
             alert("NIE UDALO SIE ZAPISAC KOSZTU");
         }
-    };  
+    };
+   
+const potwierdzUsuniecie = async () => {
+    if (!kosztDoUsuniecia) return;
+    try {
+        const odpowiedz = await fetch(`http://localhost:3000/kosztorys/${kosztDoUsuniecia}`, {
+            method: 'DELETE'
+        });
+        if (odpowiedz.ok) {
+            setDodaneKoszty(dodaneKoszty.filter(koszt => koszt.id_kosztorysu !== kosztDoUsuniecia));
+            setKosztDoUsuniecia(null); // Zamknięcie modala
+        }
+    } catch (error) {
+        alert("Błąd połączenia z serwerem");
+    }
+};
+
+const potwierdzEdycje = async () => {
+    if (!kosztDoEdycji || !nowaCenaEdycji.toString().trim()) return;
+    try {
+        const odpowiedz = await fetch(`http://localhost:3000/kosztorys/${kosztDoEdycji}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({cena: nowaCenaEdycji})
+        });
+        if (odpowiedz.ok) {
+            setDodaneKoszty(dodaneKoszty.map(koszt =>
+                koszt.id_kosztorysu === kosztDoEdycji ? {...koszt, cena: nowaCenaEdycji} : koszt
+            ));
+            setKosztDoEdycji(null); // Zamknięcie modala
+        }
+    } catch (error) {
+        alert("Błąd podczas edycji");
+    }
+};
     const sumaKosztow = dodaneKoszty.reduce((suma, koszt)=>suma + Number(koszt.cena), 0);     
     return (
        <div className={styles.szczegolyNaprawy}>
@@ -117,9 +154,17 @@ export default function SzczegolyNaprawy() {
                         {dodaneKoszty.map((koszt, index)=> (
                             <div key={index} className={styles.wierszKosztu}>
                                 <span className={styles.nazwaCzesci}>{koszt.nazwa_czesci}</span>
-                                <span className={styles.cenaCzesci}>
-                                    {Number(koszt.cena).toFixed(2).replace('.', ',')}zł
-                                </span>
+                                <div className={styles.akcjeKosztu}>
+                                    <span className={styles.cenaCzesci}>
+                                        {Number(koszt.cena).toFixed(2).replace('.', ',')} zł
+                                    </span>
+                                    <button onClick={() => { setKosztDoEdycji(koszt.id_kosztorysu); setNowaCenaEdycji(koszt.cena); }} className={styles.btnAkcja}>
+                                        <FiEdit2 />
+                                    </button>
+                                    <button onClick={() => setKosztDoUsuniecia(koszt.id_kosztorysu)} className={styles.btnAkcja}>
+                                        <FiTrash />
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -166,6 +211,36 @@ export default function SzczegolyNaprawy() {
                             Dodaj do wyceny
                         </button>
                     </div>
+                    </div>
+                </div>
+            )}
+            {kosztDoUsuniecia && (
+                <div className={styles.malyModalTlo}>
+                    <div className={styles.malyModal}>
+                        <h3>Potwierdź usunięcie</h3>
+                        <p style={{marginBottom: '20px', color: '#94a3b8'}}>Czy na pewno chcesz usunąć tę pozycję z kosztorysu?</p>
+                        <div className={styles.malyModalAkcje}>
+                            <button className={styles.btnAnuluj} onClick={() => setKosztDoUsuniecia(null)}>Anuluj</button>
+                            <button className={styles.btnZapiszKoszt} style={{backgroundColor: '#ef4444'}} onClick={potwierdzUsuniecie}>Usuń</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {kosztDoEdycji && (
+                <div className={styles.malyModalTlo}>
+                    <div className={styles.malyModal}>
+                        <h3>Edytuj cenę</h3>
+                        <input 
+                            type="number"
+                            value={nowaCenaEdycji}
+                            onChange={(e) => setNowaCenaEdycji(e.target.value)}
+                            className={styles.inputCeny}
+                        />
+                        <div className={styles.malyModalAkcje}>
+                            <button className={styles.btnAnuluj} onClick={() => setKosztDoEdycji(null)}>Anuluj</button>
+                            <button className={styles.btnZapiszKoszt} onClick={potwierdzEdycje}>Zapisz</button>
+                        </div>
                     </div>
                 </div>
             )}

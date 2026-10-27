@@ -331,3 +331,30 @@ footer {
     -webkit-appearance: none;
     margin: 0;
 }
+
+.akcjeKosztu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btnAkcja {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.btnAkcja:hover {
+    color: #3b82f6; 
+}
+
+.btnAkcja:last-child:hover {
+   color: #ef4444; 
+}
