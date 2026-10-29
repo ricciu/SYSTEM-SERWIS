@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import styles from './SzczegolyNapraw.module.css';
+import PrzebiegNaprawy from "./PrzebiegNaprawy";
 import { FiTool, FiCreditCard, FiEdit2, FiTrash } from "react-icons/fi";
 export default function SzczegolyNaprawy() {
     const { id } = useParams();
@@ -176,6 +177,9 @@ const potwierdzEdycje = async () => {
                     </div>
                     <span className={styles.infoVat}>VAT 23% wliczony</span>
                     </div>
+                </article>
+                <article className={styles.Przebieg}>
+                    <PrzebiegNaprawy aktualnyStatus={szczegoly.status}/>
                 </article>
             </section>
             <footer>

@@ -39,7 +39,7 @@ footer {
     background-color: #3b82f6;
 }
 
-.kartaKlienta, .planowanyTermin, .infUrzadzenie, .kosztorys {
+.kartaKlienta, .planowanyTermin, .infUrzadzenie, .kosztorys, .Przebieg {
     background-color: #1e293b;
     border-radius: 12px;
     padding: 20px;

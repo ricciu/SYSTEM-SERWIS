@@ -1,0 +1,47 @@
+.blokPrzebiegu {
+    border-left: 2px solid #334155;
+    padding-left: 25px;
+    position: relative;
+    margin-left: 10px;
+}
+
+.wierszKroku {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.znacznikKroku {
+    position: absolute;
+    left: -35px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    background-color: #1e293b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+h3 {
+    margin-bottom: 12px;
+}
+.zakonczony {
+    color: lightgray;
+}
+
+.aktywny {
+    color: white;
+    font-weight: 500;
+}
+
+.oczekujacy {
+    color: #475569;
+}
+
+.zakonczony .znacznikKroku {
+    color: #10b981;
+}
+
+.aktywny .znacznikKroku {
+    color: #3b82f6;
+}
