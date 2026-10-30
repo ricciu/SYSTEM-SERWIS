@@ -15,6 +15,9 @@ export default function SzczegolyNaprawy() {
     const [kosztDoUsuniecia, setKosztDoUsuniecia] = useState(null);
     const [kosztDoEdycji, setKosztDoEdycji] = useState(null);
     const [nowaCenaEdycji, setNowaCenaEdycji] = useState("");
+    const [czyStatusOtwarty, setCzyStatusOtwarty] = useState(false);
+    const [wybranyRecznyStatus, setWybranyRecznieStatus] = useState(""); 
+    
     useEffect(() => {
     const pobierzDane = async () => {
         try {
@@ -96,12 +99,34 @@ const potwierdzEdycje = async () => {
             setDodaneKoszty(dodaneKoszty.map(koszt =>
                 koszt.id_kosztorysu === kosztDoEdycji ? {...koszt, cena: nowaCenaEdycji} : koszt
             ));
-            setKosztDoEdycji(null); // Zamknięcie modala
+            setKosztDoEdycji(null); 
         }
     } catch (error) {
         alert("Błąd podczas edycji");
     }
 };
+async function potwierdzStatus(wybranyStatus) {
+    try {
+        const odpowiedz = await fetch(`http://localhost:3000/naprawy/${id}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({status: wybranyStatus})
+    });
+    if (odpowiedz.ok) {
+        setSzczegoly({...szczegoly, status: wybranyStatus})
+    };
+    setCzyStatusOtwarty(false);
+    setWybranyRecznieStatus("");
+    }
+    catch (err) {
+
+    }
+}
+const kroki_naprawy = ["Przyjęto", "W trakcie diagnozy", "Czeka na części", 
+        "Gotowe", "Odebrane"
+    ]
+const obecny_indeks = kroki_naprawy.indexOf(szczegoly.status)
+const nastepny_krok = (obecny_indeks < kroki_naprawy.length - 1 ? kroki_naprawy[obecny_indeks+1] : 'brak');
     const sumaKosztow = dodaneKoszty.reduce((suma, koszt)=>suma + Number(koszt.cena), 0);     
     return (
        <div className={styles.szczegolyNaprawy}>
@@ -184,7 +209,7 @@ const potwierdzEdycje = async () => {
             </section>
             <footer>
                 <button className={styles.kontaktKlient}>Kontakt z klientem</button>
-                <button className={styles.zmienStatus}>Zmień status</button>
+                <button className={styles.zmienStatus} onClick={()=>{setCzyStatusOtwarty(true)}}>Zmień status</button>
             </footer>
             {czyKosztyOtwarte && (
                 <div className={styles.malyModalTlo}>
@@ -244,6 +269,29 @@ const potwierdzEdycje = async () => {
                         <div className={styles.malyModalAkcje}>
                             <button className={styles.btnAnuluj} onClick={() => setKosztDoEdycji(null)}>Anuluj</button>
                             <button className={styles.btnZapiszKoszt} onClick={potwierdzEdycje}>Zapisz</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {czyStatusOtwarty  && (
+                <div className={styles.malyModalTlo}>
+                    <div className={styles.malyModal}>
+                        <h3>Zmień status naprawy</h3>
+                        {nastepny_krok != 'brak' ? (<button className={styles.btnAwans} onClick={()=> potwierdzStatus(nastepny_krok)}>Zmień na: <span>{nastepny_krok}</span></button>) : (<p>To urządzene osiągnęło już końcowy status.</p>)}
+                        <div className={styles.Separator}>
+                            Lub
+                        </div>
+                        <select className={styles.wyborCzesci} value={wybranyRecznyStatus} onChange={(e)=>setWybranyRecznieStatus(e.target.value)}>                            
+                            <option value="">Wybierz status...</option>
+                            {kroki_naprawy.map((krok)=>(
+                                <option key={krok} value={krok}>
+                                    {krok}
+                                </option>
+                            ))}
+                        </select>
+                        <div className={styles.akcjePrzyciski}>
+                            <button className={styles.btnAnuluj} onClick={() => setCzyStatusOtwarty(false)}>Anuluj</button>
+                            <button className={styles.btnZapiszKoszt} onClick={()=>potwierdzStatus(wybranyRecznyStatus)}>Zapisz</button>
                         </div>
                     </div>
                 </div>
