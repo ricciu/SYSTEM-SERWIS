@@ -123,9 +123,11 @@ footer {
 
 .pigulkaStatusu {
     border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 90%;
+    padding: 8px 20px;
+    font-size: 1.1rem;
     background-color: rgba(56, 189, 248, 0.15);
+    font-weight: 600;
+    letter-spacing: 0.7px;
 }
 
 
@@ -388,4 +390,29 @@ footer {
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.przyjeto {
+    background-color: rba(56, 189, 248, 0.2);
+    color: #38bdf8;
+}
+
+.wtrakciediagnozy {
+    background-color: rgba(250, 204, 21, 0.2);
+    color: #facc15;
+}
+
+.czekanaczesci {
+    background-color: rgba(251, 146, 60, 0.2);
+    color: #fb923c;
+}
+
+.gotowe {
+    background-color: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+}
+
+.odebrane {
+    background-color: rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
 }

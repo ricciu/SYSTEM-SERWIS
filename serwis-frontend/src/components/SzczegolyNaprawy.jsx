@@ -3,6 +3,22 @@ import { useEffect, useState } from "react";
 import styles from './SzczegolyNapraw.module.css';
 import PrzebiegNaprawy from "./PrzebiegNaprawy";
 import { FiTool, FiCreditCard, FiEdit2, FiTrash } from "react-icons/fi";
+function klasaStatusu(status) {
+    switch(status) {
+        case "Przyjęto":
+            return styles.przyjeto;
+        case "W trakcie diagnozy":
+            return styles.wtrakciediagnozy;
+        case "Czeka na części":
+            return styles.czekanaczesci;
+        case "Gotowe":
+            return styles.gotowe;
+        case "Odebrane":
+            return styles.odebrane;
+        default:
+            return "";
+    }
+}
 export default function SzczegolyNaprawy() {
     const { id } = useParams();
     const nawiguj = useNavigate();
@@ -128,12 +144,13 @@ const kroki_naprawy = ["Przyjęto", "W trakcie diagnozy", "Czeka na części",
 const obecny_indeks = kroki_naprawy.indexOf(szczegoly.status)
 const nastepny_krok = (obecny_indeks < kroki_naprawy.length - 1 ? kroki_naprawy[obecny_indeks+1] : 'brak');
     const sumaKosztow = dodaneKoszty.reduce((suma, koszt)=>suma + Number(koszt.cena), 0);     
+
     return (
        <div className={styles.szczegolyNaprawy}>
             <header className={styles.infoNaprawa}>
     <div className={styles.status}>
         <span className={styles.id}>RIC-{szczegoly.id}</span>
-        <span className={styles.pigulkaStatusu}>{szczegoly.status}</span>
+        <span className={`${styles.pigulkaStatusu} ${klasaStatusu(szczegoly.status)}`}>{szczegoly.status}</span>
         <button className={styles.btnZamknij} onClick={() => nawiguj('/naprawy')}>X</button>
     </div>
     <div className={styles.glownaSekcjaNaglowka}>
