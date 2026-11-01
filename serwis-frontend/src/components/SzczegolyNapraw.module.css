@@ -393,7 +393,7 @@ footer {
 }
 
 .przyjeto {
-    background-color: rba(56, 189, 248, 0.2);
+    background-color: rgba(56, 189, 248, 0.2);
     color: #38bdf8;
 }
 
@@ -415,4 +415,27 @@ footer {
 .odebrane {
     background-color: rgba(148, 163, 184, 0.2);
     color: #94a3b8;
+}
+
+.zakladki {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    border-bottom: 1px solid #334155;
+}
+
+.zakladka {
+    padding: 10px;
+    color: #94a3b8;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+}
+
+.zakladkaAktywna {
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 2px solid #3b82f6;
 }

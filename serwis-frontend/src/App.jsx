@@ -3,6 +3,8 @@ import { Route, Routes, Link } from "react-router-dom";
 import PanelKlientow from "./components/PanelKlientow";
 import PanelNapraw from "./components/PanelNapraw";
 import SzczegolyNaprawy from "./components/SzczegolyNaprawy";
+import Kosztorys from "./components/ZakladkaKosztorys";
+import Przeglad from "./components/ZakladkaPrzeglad";
 import './App.css';
 
 export default function App() {
@@ -33,7 +35,10 @@ export default function App() {
                         <Route path="/naprawy" element={<PanelNapraw />} />
                         <Route path="/klienci" element={<PanelKlientow />} />
                         <Route path="/magazyn" element={<h2>Magazyn</h2>} />
-                        <Route path="/naprawa/:id" element={<SzczegolyNaprawy/>}/>
+                        <Route path="/naprawa/:id" element={<SzczegolyNaprawy/>}>
+                            <Route index element={<Przeglad/>}/>
+                            <Route path="kosztorys" element={<Kosztorys/>}/>
+                        </Route>
                     </Routes>
                 </section>
             </main>
