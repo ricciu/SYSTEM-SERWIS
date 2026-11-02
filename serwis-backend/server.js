@@ -49,6 +49,18 @@ const tworzenieKosztorys = db.prepare(
     )`
 )
 tworzenieKosztorys.run();
+const tworzenieHistoria = db.prepare(
+    `CREATE TABLE IF NOT EXISTS HISTORIA(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_naprawy INTEGER NOT NULL,
+    typ TEXT NOT NULL CHECK (typ IN ('system', 'notatka')),
+    tresc TEXT NOT NULL,
+    data_utworzenia DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_naprawy) REFERENCES naprawy(id)
+    )`
+)
+
+tworzenieHistoria.run();
 
 const sprawdzMagazyn = db.prepare('SELECT COUNT(*) as count FROM Magazyn');
 if (sprawdzMagazyn.count===0) {
@@ -227,6 +239,43 @@ app.put('/kosztorys/:id', (req, res)=> {
     }
     catch (err) {
         res.status(500).json({Blad: "Blad aktualizacji"});
+    }
+})
+
+app.get('/naprawy/:id/historia', (req, res) => {
+    const idNaprawy = req.params.id;    
+    try {
+        const zapytanieHistoria = db.prepare("SELECT * FROM HISTORIA WHERE Historia.id_naprawy=? ORDER BY data_utworzenia DESC, id DESC");
+        const odpowiedzHistoria = zapytanieHistoria.all(idNaprawy);
+        res.status(200).json({historia: odpowiedzHistoria});
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({blad: "BLAD ODCZYTU"});
+    }
+})
+
+app.post('/naprawy/:id/historia', (req, res)=> {
+    try {
+        const idNaprawy = req.params.id;
+        const tresc = req.body?.tresc;
+        if (typeof tresc !== 'string') {
+            return res.status(400).json({blad: "Niepoprawna tresc"});
+        }
+        const trescClean = tresc.trim();
+        if (trescClean === "") {
+            return res.status(400).json({blad: "Niepoprawna tresc"});
+        }
+        const zapytanieCzyIstnieje = db.prepare("SELECT id FROM NAPRAWY WHERE id = ?").get(idNaprawy);
+        if (zapytanieCzyIstnieje === undefined) {
+            return res.status(404).json({blad: "Naprawa o podanym id nie istnieje"});
+        }
+        const zapisHistorii = db.prepare("INSERT INTO HISTORIA (id_naprawy, typ, tresc) VALUES (?, 'notatka', ?)").run(idNaprawy, trescClean);
+        res.status(201).json({id: zapisHistorii.lastInsertRowid});
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({blad: "BLAD DODAWANIA"});
     }
 })
 
