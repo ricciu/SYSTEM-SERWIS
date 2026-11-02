@@ -4,7 +4,8 @@ import styles from './SzczegolyNapraw.module.css';
 import PrzebiegNaprawy from "./PrzebiegNaprawy";
 
 export default function Przeglad() {
-    const {szczegoly} = useOutletContext();
+    const {szczegoly, historia} = useOutletContext();
+    
     return (
         <div className={styles.Przeglad}>
         <div className={styles.wierszKart}>  

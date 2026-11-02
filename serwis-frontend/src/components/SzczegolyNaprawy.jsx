@@ -1,5 +1,5 @@
 import { useParams, useNavigate, NavLink, Outlet } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styles from './SzczegolyNapraw.module.css';
 
 function klasaStatusu(status) {
@@ -26,7 +26,7 @@ export default function SzczegolyNaprawy() {
     const [dodaneKoszty, setDodaneKoszty] = useState([]);
     const [czyStatusOtwarty, setCzyStatusOtwarty] = useState(false);
     const [wybranyRecznyStatus, setWybranyRecznieStatus] = useState(""); 
-    
+    const [historia, setHistoria] = useState([]);
     useEffect(() => {
     const pobierzDane = async () => {
         try {
@@ -47,6 +47,24 @@ export default function SzczegolyNaprawy() {
     
     pobierzDane();
 }, [id]);
+const pobierzHistorie = useCallback(async () => {
+    try {
+        const odpowiedz = await fetch(`http://localhost:3000/naprawy/${id}/historia`
+        );
+        if (!odpowiedz.ok) {
+            console.error("BLAD pobierania historii");
+            return;
+        }
+        const daneHistoria = await odpowiedz.json();
+        setHistoria(daneHistoria.historia);
+    }
+    catch (err) {
+        console.error("BLAD POBIERANIA HISTORII", err);
+    }
+}, [id]);
+useEffect(()=> {
+    pobierzHistorie();
+}, [pobierzHistorie]);
     if (szczegoly === null) {
          return <div>Wczytywanie danych zgłoszenia...</div>   
         }
@@ -100,7 +118,7 @@ const nastepny_krok = (obecny_indeks < kroki_naprawy.length - 1 ? kroki_naprawy[
 </nav>
 
             <section className={styles.obszarRoboczy}>
-              <Outlet context={{szczegoly, dodaneKoszty, setDodaneKoszty, listaCzesci, }}/>
+              <Outlet context={{szczegoly, dodaneKoszty, setDodaneKoszty, listaCzesci, historia, odswiezHistorie: pobierzHistorie}}/>
             </section>
             <footer>
                 <button className={styles.kontaktKlient}>Kontakt z klientem</button>
