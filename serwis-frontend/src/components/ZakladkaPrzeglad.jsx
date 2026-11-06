@@ -2,10 +2,10 @@ import {  useOutletContext } from "react-router-dom";
 
 import styles from './SzczegolyNapraw.module.css';
 import PrzebiegNaprawy from "./PrzebiegNaprawy";
-
+import KrokiSerwisanta from "./KrokiSerwistanta";
 export default function Przeglad() {
     const {szczegoly, historia} = useOutletContext();
-    
+    const ile_notatek = historia.filter()
     return (
         <div className={styles.Przeglad}>
         <div className={styles.wierszKart}>  
