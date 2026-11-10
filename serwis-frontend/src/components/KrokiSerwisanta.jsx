@@ -8,6 +8,11 @@ export default function KrokiSerwisanta({wpisy, idNaprawy, poDodaniu}) {
     return (
         <article>
             <h3>Kroki serwisanta</h3>
+            <form onSubmit={(e)=>e.preventDefault()}>
+             <textarea placeholder="Opisz wykonywany krok..." value={tresc} onChange={(e)=>setTresc(e.target.value)}/>
+            <button type="submit" disabled={tresc.trim()===""}>Dodaj krok</button>
+            </form>
+        
             {wpisy.length === 0 ? (
                 <p>Brak zapisanych kroków</p> )
                 : (
@@ -17,7 +22,7 @@ export default function KrokiSerwisanta({wpisy, idNaprawy, poDodaniu}) {
                         ))}
                     </ul>
                 )
-}           <textarea placeholder="Opisz wykonywany krok..." value={tresc} onChange={(e)=>setTresc(e.target.value)}/>
+}          
 
         </article>
     )
