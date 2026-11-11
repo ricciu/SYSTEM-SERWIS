@@ -2,7 +2,7 @@ const Database = require('better-sqlite3');
 const cors = require('cors');
 const express = require('express');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
@@ -23,6 +23,7 @@ const tworzenie_naprawy = db.prepare(
     opis_usterki TEXT NOT NULL, 
     status TEXT DEFAULT 'Przyjęto' NOT NULL,
     id_klienta INTEGER NOT NULL,
+    opis_prac TEXT,
     FOREIGN KEY (id_klienta) REFERENCES klienci(id)
     )`
 );
@@ -56,11 +57,59 @@ const tworzenieHistoria = db.prepare(
     typ TEXT NOT NULL CHECK (typ IN ('system', 'notatka')),
     tresc TEXT NOT NULL,
     data_utworzenia DATETIME DEFAULT CURRENT_TIMESTAMP,
+    autor TEXT,
+    poprzednio TEXT,
     FOREIGN KEY (id_naprawy) REFERENCES naprawy(id)
     )`
 )
 
 tworzenieHistoria.run();
+
+// Migracje: CREATE TABLE IF NOT EXISTS nie zmienia istniejących tabel,
+// więc brakujące kolumny dodajemy ręcznie.
+function maKolumne(tabela, kolumna) {
+    return db.prepare(`PRAGMA table_info(${tabela})`).all().some((k) => k.name === kolumna);
+}
+if (!maKolumne('HISTORIA', 'autor')) {
+    db.exec("ALTER TABLE HISTORIA ADD COLUMN autor TEXT");
+}
+if (!maKolumne('HISTORIA', 'poprzednio')) {
+    db.exec("ALTER TABLE HISTORIA ADD COLUMN poprzednio TEXT");
+}
+if (!maKolumne('NAPRAWY', 'opis_prac')) {
+    db.exec("ALTER TABLE NAPRAWY ADD COLUMN opis_prac TEXT");
+    // dawne "kroki serwisanta" (wpisy typu 'notatka') łączymy w jeden opis prac
+    db.exec(`UPDATE NAPRAWY SET opis_prac = (
+            SELECT group_concat(tresc, char(10)) FROM HISTORIA
+            WHERE HISTORIA.id_naprawy = NAPRAWY.id AND HISTORIA.typ = 'notatka')
+        WHERE EXISTS (
+            SELECT 1 FROM HISTORIA WHERE HISTORIA.id_naprawy = NAPRAWY.id AND HISTORIA.typ = 'notatka')`);
+}
+
+// Historia zmian: wpisy typu 'system' zapisuje wyłącznie backend,
+// zawsze w tej samej transakcji co sama zmiana.
+const wstawLog = db.prepare("INSERT INTO HISTORIA (id_naprawy, typ, tresc, autor, poprzednio) VALUES (?, 'system', ?, ?, ?)");
+function zapiszLog(idNaprawy, tresc, autor, poprzednio = null) {
+    wstawLog.run(idNaprawy, tresc, autor, poprzednio);
+}
+
+// "Kto": aplikacja nie ma logowania, więc nazwę serwisanta wysyła frontend w nagłówku
+// X-Operator (zakodowaną, bo nagłówki nie przenoszą polskich znaków). To podpis, a nie uwierzytelnienie.
+function autorZmiany(req) {
+    const naglowek = req.get('X-Operator');
+    if (!naglowek) return 'Nieznany';
+    try {
+        return decodeURIComponent(naglowek).trim().slice(0, 40) || 'Nieznany';
+    } catch {
+        return 'Nieznany';
+    }
+}
+function kwota(wartosc) {
+    return Number(wartosc).toFixed(2).replace('.', ',') + ' zł';
+}
+function skroc(tekst, max = 60) {
+    return tekst.length > max ? tekst.slice(0, max) + '…' : tekst;
+}
 
 const sprawdzMagazyn = db.prepare('SELECT COUNT(*) as count FROM Magazyn');
 if (sprawdzMagazyn.count===0) {
@@ -135,15 +184,25 @@ app.put('/naprawy/:id', (req, res)=> {
             });
         }
     const idNaprawy = req.params.id;
-    const aktualizujStatus = db.prepare(`
-        UPDATE NAPRAWY SET status = ? WHERE id = ?
-        `);
-    const wynik = aktualizujStatus.run(req.body.status, idNaprawy);
-
-    if (wynik.changes === 0) {
-        return res.status(404).json({blad: "Nie znaleziono naprawy o podanym ID"});
+    try {
+        const naprawa = db.prepare("SELECT status FROM NAPRAWY WHERE id = ?").get(idNaprawy);
+        if (naprawa === undefined) {
+            return res.status(404).json({blad: "Nie znaleziono naprawy o podanym ID"});
+        }
+        // zmiana statusu i wpis w historii zapisują się razem albo wcale
+        const zmienStatus = db.transaction(() => {
+            db.prepare("UPDATE NAPRAWY SET status = ? WHERE id = ?").run(req.body.status, idNaprawy);
+            if (naprawa.status !== req.body.status) {
+                zapiszLog(idNaprawy, `Status: ${naprawa.status} → ${req.body.status}`, autorZmiany(req));
+            }
+        });
+        zmienStatus();
+        return res.status(200).json({wiadomosc: "Status naprawy zaktualizowany"});
     }
-    return res.status(200).json({wiadomosc: "Status naprawy zaktualizowany"});
+    catch (err) {
+        console.error(err);
+        return res.status(500).json({blad: "Blad bazy danych"});
+    }
 })
 
 app.get('/naprawy', (req, res)=> {
@@ -209,10 +268,17 @@ app.post('/kosztorys', (req, res)=>{
         const cena = req.body.cena;
         const zapytanie = db.prepare(`INSERT INTO KOSZTORYS (id_zlecenia, id_czesci, cena_koncowa) VALUES
     (?, ?, ?)`);
-        const zapytanieKosztorys = zapytanie.run(id_zlecenia, id_czesci, cena);
+        const dodajPozycje = db.transaction(() => {
+            const wynik = zapytanie.run(id_zlecenia, id_czesci, cena);
+            const czesc = db.prepare("SELECT nazwa_czesci FROM MAGAZYN WHERE id = ?").get(id_czesci);
+            zapiszLog(id_zlecenia, `Kosztorys: dodano „${czesc.nazwa_czesci}” (${kwota(cena)})`, autorZmiany(req));
+            return wynik;
+        });
+        const zapytanieKosztorys = dodajPozycje();
         res.status(201).json({Sukces: "Dodano kosztorys", id_kosztorysu: zapytanieKosztorys.lastInsertRowid })
     }
     catch (err) {
+        console.error(err);
         res.status(500).json({Blad: "BLAD DODAWANIA DO BAZY DANYCH"})
     }
 })
@@ -220,9 +286,19 @@ app.post('/kosztorys', (req, res)=>{
 app.delete('/kosztorys/:id', (req, res)=> {
     try {
         const idDoUsuniecia = req.params.id;
-        const zapytanie = db.prepare('DELETE FROM Kosztorys WHERE id = ?');
-        const usuniecie = zapytanie.run(idDoUsuniecia);
-        res.status(201).json({Sukces: "Poprawnie usunieto wiersz"});
+        // dane pozycji pobieramy PRZED usunięciem, bo potem już ich nie ma
+        const pozycja = db.prepare(`SELECT Kosztorys.id_zlecenia, Kosztorys.cena_koncowa, Magazyn.nazwa_czesci
+            FROM Kosztorys JOIN Magazyn ON Magazyn.id = Kosztorys.id_czesci
+            WHERE Kosztorys.id = ?`).get(idDoUsuniecia);
+        if (pozycja === undefined) {
+            return res.status(404).json({Blad: "Nie znaleziono pozycji kosztorysu"});
+        }
+        const usunPozycje = db.transaction(() => {
+            db.prepare('DELETE FROM Kosztorys WHERE id = ?').run(idDoUsuniecia);
+            zapiszLog(pozycja.id_zlecenia, `Kosztorys: usunięto „${pozycja.nazwa_czesci}” (${kwota(pozycja.cena_koncowa)})`, autorZmiany(req));
+        });
+        usunPozycje();
+        res.status(200).json({Sukces: "Poprawnie usunieto wiersz"});
     }   
     catch (err) {
         res.status(500).json({Blad: "Blad usuwania wiersza"});
@@ -233,9 +309,23 @@ app.put('/kosztorys/:id', (req, res)=> {
     try {
         const nowaCena = req.body.cena;
         const idDoUsuniecia = req.params.id;
-        const zapytanie = db.prepare('UPDATE KOSZTORYS SET cena_koncowa = ? WHERE id = ?')
-        const aktualizacja = zapytanie.run(nowaCena, idDoUsuniecia)
-        res.status(201).json({Sukces: "Pomyslnie zaktualizowano rekord"});
+        if (nowaCena === undefined || nowaCena === "" || Number.isNaN(Number(nowaCena))) {
+            return res.status(400).json({Blad: "Niepoprawna cena"});
+        }
+        const pozycja = db.prepare(`SELECT Kosztorys.id_zlecenia, Kosztorys.cena_koncowa, Magazyn.nazwa_czesci
+            FROM Kosztorys JOIN Magazyn ON Magazyn.id = Kosztorys.id_czesci
+            WHERE Kosztorys.id = ?`).get(idDoUsuniecia);
+        if (pozycja === undefined) {
+            return res.status(404).json({Blad: "Nie znaleziono pozycji kosztorysu"});
+        }
+        const zmienCene = db.transaction(() => {
+            db.prepare('UPDATE KOSZTORYS SET cena_koncowa = ? WHERE id = ?').run(nowaCena, idDoUsuniecia);
+            if (Number(pozycja.cena_koncowa) !== Number(nowaCena)) {
+                zapiszLog(pozycja.id_zlecenia, `Kosztorys: „${pozycja.nazwa_czesci}” ${kwota(pozycja.cena_koncowa)} → ${kwota(nowaCena)}`, autorZmiany(req));
+            }
+        });
+        zmienCene();
+        res.status(200).json({Sukces: "Pomyslnie zaktualizowano rekord"});
     }
     catch (err) {
         res.status(500).json({Blad: "Blad aktualizacji"});
@@ -255,27 +345,48 @@ app.get('/naprawy/:id/historia', (req, res) => {
     }
 })
 
-app.post('/naprawy/:id/historia', (req, res)=> {
+// Opis wykonanych prac: jedno pole na naprawę, edytowane w miejscu.
+// Każda zmiana trafia do historii zmian (kto, kiedy, co), a poprzednia wersja
+// opisu zostaje zapisana w kolumnie "poprzednio", żeby dało się ją przejrzeć w razie potrzeby.
+app.put('/naprawy/:id/opis', (req, res) => {
     try {
         const idNaprawy = req.params.id;
-        const tresc = req.body?.tresc;
-        if (typeof tresc !== 'string') {
-            return res.status(400).json({blad: "Niepoprawna tresc"});
+        const opis = req.body?.opis;
+        if (typeof opis !== 'string') {
+            return res.status(400).json({blad: "Niepoprawny opis"});
         }
-        const trescClean = tresc.trim();
-        if (trescClean === "") {
-            return res.status(400).json({blad: "Niepoprawna tresc"});
+        const nowyOpis = opis.trim();
+        if (nowyOpis.length > 5000) {
+            return res.status(400).json({blad: "Opis jest za dlugi (maksymalnie 5000 znakow)"});
         }
-        const zapytanieCzyIstnieje = db.prepare("SELECT id FROM NAPRAWY WHERE id = ?").get(idNaprawy);
-        if (zapytanieCzyIstnieje === undefined) {
-            return res.status(404).json({blad: "Naprawa o podanym id nie istnieje"});
+        const naprawa = db.prepare("SELECT opis_prac FROM NAPRAWY WHERE id = ?").get(idNaprawy);
+        if (naprawa === undefined) {
+            return res.status(404).json({blad: "Nie znaleziono naprawy o podanym ID"});
         }
-        const zapisHistorii = db.prepare("INSERT INTO HISTORIA (id_naprawy, typ, tresc) VALUES (?, 'notatka', ?)").run(idNaprawy, trescClean);
-        res.status(201).json({id: zapisHistorii.lastInsertRowid});
+        const staryOpis = (naprawa.opis_prac || "").trim();
+        if (staryOpis === nowyOpis) {
+            return res.status(200).json({wiadomosc: "Bez zmian", opis: nowyOpis});
+        }
+        let wpis;
+        if (staryOpis === "") {
+            wpis = `Opis prac: dodano opis „${skroc(nowyOpis, 50)}”`;
+        }
+        else if (nowyOpis === "") {
+            wpis = "Opis prac: usunięto opis";
+        }
+        else {
+            wpis = `Opis prac: zmieniono opis (${staryOpis.length} → ${nowyOpis.length} znaków)`;
+        }
+        const zapiszOpis = db.transaction(() => {
+            db.prepare("UPDATE NAPRAWY SET opis_prac = ? WHERE id = ?").run(nowyOpis, idNaprawy);
+            zapiszLog(idNaprawy, wpis, autorZmiany(req), staryOpis === "" ? null : staryOpis);
+        });
+        zapiszOpis();
+        res.status(200).json({wiadomosc: "Zapisano opis", opis: nowyOpis});
     }
     catch (err) {
         console.error(err);
-        res.status(500).json({blad: "BLAD DODAWANIA"});
+        res.status(500).json({blad: "BLAD ZAPISU OPISU"});
     }
 })
 

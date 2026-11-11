@@ -1,7 +1,7 @@
 .widokNapraw {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
 }
 
 
@@ -9,49 +9,135 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
+}
+
+.naglowekGorny h2 {
+    margin: 0 0 4px 0;
+}
+
+.naglowekGorny p {
+    color: var(--tekst-2);
 }
 
 .dodajNaprawe {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     border: none;
-    background-color: #38bdf8;
-    color: #0f172a;
+    background: var(--akcent-gradient);
+    color: #ffffff;
     padding: 10px 20px;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: 600;
-    transition: background-color 0.2s;
+    box-shadow: var(--akcent-poswiata);
+    transition: transform 0.15s ease, filter 0.2s ease;
 }
 
 .dodajNaprawe:hover {
-    background-color: #0ea5e9;
+    filter: brightness(1.08);
+    transform: translateY(-1px);
 }
 
+
+/* ---------- karty statystyk ---------- */
 
 .kartyStatystyk {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    gap: 12px;
 }
 
-.kartyStatystyk div {
-    background-color: #1e293b;
+.kartyStatystyk > div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--karta);
+    border: 1px solid var(--ramka);
+    border-top: 2px solid var(--kolor);
     border-radius: 12px;
-    padding: 24px;
+    box-shadow: var(--cien);
+    padding: 10px 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.kartyStatystyk > div:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--cien-hover);
+}
+
+.kartyStatystyk h3 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--tekst);
+}
+
+.kartyStatystyk p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--tekst-2);
+}
+
+/* każda karta ma swój kolor (zmienne --kolor i --kolor-tlo) */
+.wszystkieZlecenia {
+    --kolor: var(--akcent);
+    --kolor-tlo: var(--akcent-tlo);
+    --kolor-tekst: var(--akcent-tekst);
+}
+
+.Przyjete {
+    --kolor: var(--st-przyjeto);
+    --kolor-tlo: var(--st-przyjeto-tlo);
+    --kolor-tekst: var(--st-przyjeto);
+}
+
+.wNaprawie {
+    --kolor: var(--st-czeka);
+    --kolor-tlo: var(--st-czeka-tlo);
+    --kolor-tekst: var(--st-czeka);
+}
+
+.gotowe {
+    --kolor: var(--st-gotowe);
+    --kolor-tlo: var(--st-gotowe-tlo);
+    --kolor-tekst: var(--st-gotowe);
+}
+
+.ikonaStatystyki {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background-color: var(--kolor-tlo);
+    color: var(--kolor-tekst);
+    font-size: 1.05rem;
+}
+
+
+/* ---------- panel z tabelą ---------- */
 
 .panelTabela {
-    background-color: #1e293b;
-    border-radius: 12px;
+    background-color: var(--karta);
+    color: var(--tekst);
+    border: 1px solid var(--ramka);
+    border-radius: 14px;
+    box-shadow: var(--cien);
     padding: 20px;
 }
 
 .przyciskiStatusow {
     display: flex;
-    gap: 10px;
-    border-bottom: 1px solid #334155;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid var(--ramka);
     padding-bottom: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .przyciskiStatusow button {
@@ -59,45 +145,67 @@
     border: none;
     padding: 8px 16px;
     cursor: pointer;
-    color: #94a3b8;
-    border-radius: 6px;
+    color: var(--tekst-2);
+    font-weight: 500;
+    border-radius: 999px;
     transition: all 0.2s;
 }
 
 .przyciskiStatusow button:hover {
-    background-color: #334155;
-    color: #f8fafc;
+    background-color: var(--karta-2);
+    color: var(--tekst);
 }
 
 
 .przyciskiStatusow button.aktywny {
-    color: #38bdf8;
-    font-weight: bold;
+    background: var(--akcent-gradient);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: var(--akcent-poswiata);
 }
 
 
-table {
+/* tabela: reguły ograniczone do wrappera, żeby nie wpływały na inne tabele */
+.tabelaDanych {
+    overflow-x: auto;
+}
+
+.tabelaDanych table {
     width: 100%;
     border-collapse: collapse;
 }
 
-table th {
+.tabelaDanych th {
     text-align: left;
     padding: 15px 10px;
-    color: #64748b;
-    font-size: 0.8rem;
+    color: var(--tekst-3);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    border-bottom: 1px solid #334155;
+    border-bottom: 1px solid var(--ramka);
 }
 
-table td {
+.tabelaDanych td {
     text-align: left;
     padding: 15px 10px;
-    border-bottom: 1px solid #334155;
+    border-bottom: 1px solid var(--ramka);
     vertical-align: middle;
 }
 
-table tr:last-child td {
+.tabelaDanych td:first-child {
+    font-weight: 700;
+    color: var(--akcent-tekst);
+}
+
+.tabelaDanych tbody tr {
+    transition: background-color 0.15s;
+}
+
+.tabelaDanych tbody tr:hover {
+    background-color: var(--karta-2);
+}
+
+.tabelaDanych tr:last-child td {
     border-bottom: none;
 }
 
@@ -109,37 +217,79 @@ table tr:last-child td {
 }
 
 .inicjaly {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #334155;
-    color: #38bdf8;
-    font-weight: bold;
+    background: var(--akcent-gradient);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
 }
 
+/* etykiety statusów: kolor zależy od klasy wariantu */
 .status {
+    display: inline-block;
     padding: 4px 12px;
-    border-radius: 20px;
-    background-color: rgba(127, 255, 212, 0.15);
-    color: aquamarine;
-    font-weight: 500;
-    font-size: 0.85rem;
+    border-radius: 999px;
+    background-color: var(--st-odebrane-tlo);
+    color: var(--st-odebrane);
+    font-weight: 600;
+    font-size: 0.82rem;
+}
+
+.stPrzyjeto {
+    background-color: var(--st-przyjeto-tlo);
+    color: var(--st-przyjeto);
+}
+
+.stDiagnoza {
+    background-color: var(--st-diagnoza-tlo);
+    color: var(--st-diagnoza);
+}
+
+.stCzeka {
+    background-color: var(--st-czeka-tlo);
+    color: var(--st-czeka);
+}
+
+.stGotowe {
+    background-color: var(--st-gotowe-tlo);
+    color: var(--st-gotowe);
+}
+
+.stOdebrane {
+    background-color: var(--st-odebrane-tlo);
+    color: var(--st-odebrane);
 }
 
 .szczegoly {
-    background: transparent;
-    border: 1px solid #475569;
-    color: #e2e8f0;
-    padding: 6px 12px;
-    border-radius: 6px;
+    background-color: var(--karta);
+    border: 1px solid var(--ramka-mocna);
+    color: var(--tekst);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .szczegoly:hover {
-    border-color: #38bdf8;
-    color: #38bdf8;
+    border-color: var(--akcent);
+    color: var(--akcent-tekst);
+    background-color: var(--akcent-tlo);
+}
+
+@media (max-width: 1000px) {
+    .kartyStatystyk {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .kartyStatystyk {
+        grid-template-columns: 1fr;
+    }
 }

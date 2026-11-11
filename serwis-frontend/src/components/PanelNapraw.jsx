@@ -1,6 +1,26 @@
 import { useState, useEffect } from "react";
 import styles from './PanelNapraw.module.css';
 import { useNavigate } from "react-router-dom";
+import { FiPlus, FiLayers, FiInbox, FiTool, FiCheckCircle } from "react-icons/fi";
+
+// zamiana statusu z bazy na klasę koloru etykiety (tak samo jak w SzczegolyNaprawy)
+function klasaStatusu(status) {
+    switch(status) {
+        case "Przyjęto":
+            return styles.stPrzyjeto;
+        case "W trakcie diagnozy":
+            return styles.stDiagnoza;
+        case "Czeka na części":
+            return styles.stCzeka;
+        case "Gotowe":
+            return styles.stGotowe;
+        case "Odebrane":
+            return styles.stOdebrane;
+        default:
+            return "";
+    }
+}
+
 export default function PanelNapraw() {
     const [listaNapraw, setListaNapraw] = useState([]);
     const [aktywnyFiltr, setAktywnyFiltr] = useState("Wszystkie");
@@ -32,24 +52,36 @@ export default function PanelNapraw() {
                 <h2>Naprawy</h2>
                 <p>Wszystkie zgłoszenia serwisowe</p>
                 </div>
-                <button className={styles.dodajNaprawe}>+Dodaj naprawę</button>
+                <button className={styles.dodajNaprawe}><FiPlus /> Dodaj naprawę</button>
             </header>
             <div className={styles.kartyStatystyk}>
                 <div className={styles.wszystkieZlecenia}>
-                <h3>{wszystkie}</h3>
-                <p>Wszystkie</p>
+                    <span className={styles.ikonaStatystyki}><FiLayers /></span>
+                    <div>
+                        <h3>{wszystkie}</h3>
+                        <p>Wszystkie</p>
+                    </div>
                 </div>
                 <div className={styles.Przyjete}>
-                    <h3>{przyjete}</h3>
-                    <p>Przyjęte</p>
+                    <span className={styles.ikonaStatystyki}><FiInbox /></span>
+                    <div>
+                        <h3>{przyjete}</h3>
+                        <p>Przyjęte</p>
+                    </div>
                 </div>
                 <div className={styles.wNaprawie}>
-                    <h3>{wTrakcie}</h3>
-                    <p>W naprawie</p>
+                    <span className={styles.ikonaStatystyki}><FiTool /></span>
+                    <div>
+                        <h3>{wTrakcie}</h3>
+                        <p>W naprawie</p>
+                    </div>
                 </div>
                 <div className={styles.gotowe}>
-                    <h3>{gotowe}</h3>
-                    <p>Gotowe do odbioru</p>
+                    <span className={styles.ikonaStatystyki}><FiCheckCircle /></span>
+                    <div>
+                        <h3>{gotowe}</h3>
+                        <p>Gotowe do odbioru</p>
+                    </div>
                 </div>
             </div>
 
@@ -85,7 +117,7 @@ export default function PanelNapraw() {
                                         <div className={styles.inicjaly}>{naprawa.imie_nazwisko[0]}</div>
                                         <span className={styles.Imie}>{naprawa.imie_nazwisko}</span>
                                     </td>
-                                    <td><span className={styles.status}>{naprawa.status}</span></td>
+                                    <td><span className={`${styles.status} ${klasaStatusu(naprawa.status)}`}>{naprawa.status}</span></td>
                                     <td><button className={styles.szczegoly} onClick={()=>nawiguj(`/naprawa/${naprawa.id}`)}>Szczegóły</button></td>
                                 </tr>
                             )

@@ -1,5 +1,5 @@
 import styles from './PrzebiegNaprawy.module.css';
-import {FiCheck, FiCircle} from 'react-icons/fi';
+import {FiCheck, FiCircle, FiActivity} from 'react-icons/fi';
 
 export default function PrzebiegNaprawy({aktualnyStatus}) {
     const kroki = ["Przyjęto", "W trakcie diagnozy", "Czeka na części", 
@@ -8,7 +8,7 @@ export default function PrzebiegNaprawy({aktualnyStatus}) {
     const obecny_indeks = kroki.indexOf(aktualnyStatus);
     return (
         <div className={styles.glownyKontenerStatus}>
-            <h3>Przebieg naprawy</h3>
+            <h3 className={styles.naglowek}><FiActivity /> Przebieg naprawy</h3>
             <section className={styles.blokPrzebiegu}>
                 {kroki.map((krok, index)=> {
                 let stan_kroku = "oczekujacy";

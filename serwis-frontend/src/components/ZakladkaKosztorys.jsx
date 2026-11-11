@@ -2,11 +2,12 @@ import { useParams, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import styles from './SzczegolyNapraw.module.css';
 import { FiCreditCard, FiEdit2, FiTrash } from "react-icons/fi";
+import { naglowkiApi } from "../tools/api";
 
 
 export default function Kosztorys() {
     const {id} = useParams();
-    const {dodaneKoszty, setDodaneKoszty, listaCzesci} = useOutletContext();
+    const {dodaneKoszty, setDodaneKoszty, listaCzesci, odswiezHistorie} = useOutletContext();
     const [czyKosztyOtwarte, setCzyKosztyOtwarte] = useState(false);
     const [wybranaCzesc, setWybranaCzesc] = useState("");
     const [wpisanaCena, setWpisanaCena] = useState("");
@@ -17,7 +18,7 @@ export default function Kosztorys() {
         try {
             const dodajKoszt = await fetch('http://localhost:3000/kosztorys',
                 {method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: naglowkiApi(),
                 body: JSON.stringify({
                     id_zlecenia: id,
                     id_czesci: wybranaCzesc,
@@ -36,6 +37,7 @@ export default function Kosztorys() {
                     id_kosztorysu: odpowiedzSerwera.id_kosztorysu
                 };
                 setDodaneKoszty([...dodaneKoszty, nowyKoszt]);
+                odswiezHistorie();
             }
         }
         catch (err) {
@@ -48,11 +50,13 @@ const potwierdzUsuniecie = async () => {
     if (!kosztDoUsuniecia) return;
     try {
         const odpowiedz = await fetch(`http://localhost:3000/kosztorys/${kosztDoUsuniecia}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: naglowkiApi()
         });
         if (odpowiedz.ok) {
             setDodaneKoszty(dodaneKoszty.filter(koszt => koszt.id_kosztorysu !== kosztDoUsuniecia));
             setKosztDoUsuniecia(null); // Zamknięcie modala
+            odswiezHistorie();
         }
     } catch (error) {
         alert("Błąd połączenia z serwerem");
@@ -64,14 +68,15 @@ const potwierdzEdycje = async () => {
     try {
         const odpowiedz = await fetch(`http://localhost:3000/kosztorys/${kosztDoEdycji}`, {
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
+            headers: naglowkiApi(),
             body: JSON.stringify({cena: nowaCenaEdycji})
         });
         if (odpowiedz.ok) {
             setDodaneKoszty(dodaneKoszty.map(koszt =>
                 koszt.id_kosztorysu === kosztDoEdycji ? {...koszt, cena: nowaCenaEdycji} : koszt
             ));
-            setKosztDoEdycji(null); 
+            setKosztDoEdycji(null);
+            odswiezHistorie();
         }
     } catch (error) {
         alert("Błąd podczas edycji");
@@ -152,10 +157,10 @@ const sumaKosztow = dodaneKoszty.reduce((suma, koszt)=>suma + Number(koszt.cena)
                 <div className={styles.malyModalTlo}>
                     <div className={styles.malyModal}>
                         <h3>Potwierdź usunięcie</h3>
-                        <p style={{marginBottom: '20px', color: '#94a3b8'}}>Czy na pewno chcesz usunąć tę pozycję z kosztorysu?</p>
+                        <p className={styles.tekstModalu}>Czy na pewno chcesz usunąć tę pozycję z kosztorysu?</p>
                         <div className={styles.malyModalAkcje}>
                             <button className={styles.btnAnuluj} onClick={() => setKosztDoUsuniecia(null)}>Anuluj</button>
-                            <button className={styles.btnZapiszKoszt} style={{backgroundColor: '#ef4444'}} onClick={potwierdzUsuniecie}>Usuń</button>
+                            <button className={`${styles.btnZapiszKoszt} ${styles.btnUsun}`} onClick={potwierdzUsuniecie}>Usuń</button>
                         </div>
                     </div>
                 </div>

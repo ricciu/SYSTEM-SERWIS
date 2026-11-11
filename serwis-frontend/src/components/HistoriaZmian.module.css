@@ -1,0 +1,105 @@
+/* Panel ma się nie rzucać w oczy: brak tła i cienia, małe przygaszone pismo,
+   przewija się wewnątrz, więc nigdy nie rozpycha strony. */
+
+.panel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 14px;
+    border: 1px dashed var(--ramka-mocna);
+    border-radius: 12px;
+}
+
+.tytul {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 8px 0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--tekst-3);
+}
+
+.pusto {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--tekst-3);
+}
+
+.lista {
+    list-style: none;
+    margin: 0;
+    padding: 0 4px 0 0;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.wpis {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--ramka);
+    font-size: 0.76rem;
+    line-height: 1.35;
+}
+
+.wpis:last-child {
+    border-bottom: none;
+}
+
+.meta {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.czas {
+    color: var(--tekst-3);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.7rem;
+}
+
+.autor {
+    color: var(--tekst-2);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.rozwijane summary {
+    cursor: pointer;
+}
+
+.poprzednio {
+    margin: 4px 0 0 0;
+    padding: 6px 8px;
+    border-left: 2px solid var(--ramka-mocna);
+    background-color: var(--karta-2);
+    border-radius: 4px;
+    color: var(--tekst-3);
+    font-family: inherit;
+    font-size: 0.72rem;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.tresc {
+    color: var(--tekst-2);
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 1100px) {
+    .panel {
+        flex: none;
+    }
+
+    .lista {
+        max-height: 200px;
+    }
+}

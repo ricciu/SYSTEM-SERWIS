@@ -1,5 +1,5 @@
 .blokPrzebiegu {
-    border-left: 2px solid #334155;
+    border-left: 2px solid var(--ramka-mocna);
     padding-left: 25px;
     position: relative;
     margin-left: 10px;
@@ -7,41 +7,61 @@
 
 .wierszKroku {
     position: relative;
-    margin-bottom: 25px;
+    margin-bottom: 14px;
+    font-size: 0.92rem;
 }
 
+.wierszKroku:last-child {
+    margin-bottom: 0;
+}
+
+/* tło znacznika = tło karty, żeby zasłaniał linię osi */
 .znacznikKroku {
     position: absolute;
     left: -35px;
     top: 0;
     width: 24px;
     height: 24px;
-    background-color: #1e293b;
+    border-radius: 50%;
+    background-color: var(--karta);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-h3 {
-    margin-bottom: 12px;
+.naglowek {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px 0;
+    font-size: 1rem;
+    font-weight: 600;
 }
+
+.naglowek svg {
+    color: var(--akcent-tekst);
+}
+
 .zakonczony {
-    color: lightgray;
+    color: var(--tekst-2);
 }
 
 .aktywny {
-    color: white;
-    font-weight: 500;
+    color: var(--tekst);
+    font-weight: 600;
 }
 
 .oczekujacy {
-    color: #475569;
+    color: var(--tekst-3);
 }
 
 .zakonczony .znacznikKroku {
-    color: #10b981;
+    color: var(--st-gotowe);
 }
 
+/* aktywny krok: znacznik z poświatą */
 .aktywny .znacznikKroku {
-    color: #3b82f6;
+    color: var(--akcent-tekst);
+    background-color: var(--akcent-tlo);
+    box-shadow: 0 0 0 4px var(--akcent-tlo);
 }

@@ -1,0 +1,106 @@
+/* ==========================================================
+   TOKENY MOTYWU
+   Wszystkie kolory aplikacji pochodzą stąd. Komponenty używają
+   var(--nazwa), a przełącznik motywu podmienia tylko ten zestaw.
+   ========================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* powierzchnie */
+  --tlo: #f3f4fb;
+  --karta: #ffffff;
+  --karta-2: #f6f7fd;
+  --ramka: #e3e5f1;
+  --ramka-mocna: #cfd3e8;
+
+  /* tekst */
+  --tekst: #14162b;
+  --tekst-2: #566079;
+  --tekst-3: #8a90ab;
+
+  /* akcent marki */
+  --akcent: #5b5ff0;
+  --akcent-gradient: linear-gradient(135deg, #5b5ff0 0%, #9b5cf6 100%);
+  --akcent-tlo: rgba(91, 95, 240, 0.12);
+  --akcent-tekst: #4a4ee0;
+  --akcent-poswiata: 0 6px 18px rgba(91, 95, 240, 0.35);
+
+  /* cienie i nakładki */
+  --cien: 0 1px 2px rgba(20, 22, 43, 0.05), 0 6px 18px rgba(20, 22, 43, 0.06);
+  --cien-hover: 0 2px 4px rgba(20, 22, 43, 0.06), 0 12px 28px rgba(20, 22, 43, 0.12);
+  --modal-tlo: rgba(15, 17, 36, 0.55);
+  --pasek: rgba(255, 255, 255, 0.8);
+
+  /* menu boczne (ciemne w obu motywach, to część charakteru aplikacji) */
+  --menu-tlo: linear-gradient(180deg, #181b3b 0%, #11132b 100%);
+  --menu-tekst: #a9aed3;
+  --menu-hover: rgba(255, 255, 255, 0.08);
+
+  /* stany */
+  --niebezpieczny: #e5484d;
+  --niebezpieczny-tlo: rgba(229, 72, 77, 0.12);
+
+  /* statusy napraw */
+  --st-przyjeto: #3a46d6;
+  --st-przyjeto-tlo: #e3e8ff;
+  --st-diagnoza: #8a5300;
+  --st-diagnoza-tlo: #fff0c2;
+  --st-czeka: #c2410c;
+  --st-czeka-tlo: #ffe1d1;
+  --st-gotowe: #0d7a39;
+  --st-gotowe-tlo: #d3f6df;
+  --st-odebrane: #5f6584;
+  --st-odebrane-tlo: #e9eaf3;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --tlo: #0a0c1a;
+  --karta: #14172e;
+  --karta-2: #1b1f3d;
+  --ramka: #262a4d;
+  --ramka-mocna: #383e6e;
+
+  --tekst: #eef0fc;
+  --tekst-2: #a9aecf;
+  --tekst-3: #7479a3;
+
+  --akcent: #8b8ff8;
+  --akcent-gradient: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+  --akcent-tlo: rgba(139, 143, 248, 0.16);
+  --akcent-tekst: #a5a9ff;
+  --akcent-poswiata: 0 6px 22px rgba(99, 102, 241, 0.45);
+
+  --cien: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --cien-hover: 0 2px 4px rgba(0, 0, 0, 0.45), 0 14px 32px rgba(0, 0, 0, 0.5);
+  --modal-tlo: rgba(3, 4, 12, 0.7);
+  --pasek: rgba(20, 23, 46, 0.8);
+
+  --menu-tlo: linear-gradient(180deg, #0f1228 0%, #0a0c1a 100%);
+  --menu-tekst: #8f94bd;
+  --menu-hover: rgba(255, 255, 255, 0.06);
+
+  --niebezpieczny: #ff6369;
+  --niebezpieczny-tlo: rgba(255, 99, 105, 0.16);
+
+  --st-przyjeto: #a4b0ff;
+  --st-przyjeto-tlo: rgba(99, 115, 255, 0.2);
+  --st-diagnoza: #fcd34d;
+  --st-diagnoza-tlo: rgba(250, 204, 21, 0.18);
+  --st-czeka: #fdba74;
+  --st-czeka-tlo: rgba(251, 146, 60, 0.2);
+  --st-gotowe: #6ee7b7;
+  --st-gotowe-tlo: rgba(52, 211, 153, 0.18);
+  --st-odebrane: #b6bdd6;
+  --st-odebrane-tlo: rgba(148, 163, 184, 0.18);
+}
+
+body {
+  background-color: var(--tlo);
+  color: var(--tekst);
+  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}

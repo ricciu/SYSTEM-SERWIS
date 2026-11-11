@@ -1,0 +1,160 @@
+/* Karta wypełnia dostępną wysokość kolumny, a pole tekstowe rośnie razem z nią. */
+.karta {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: var(--karta);
+    color: var(--tekst);
+    border: 1px solid var(--ramka);
+    border-radius: 14px;
+    box-shadow: var(--cien);
+    padding: 16px;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+/* h3 w JSX nie ma klasy, więc stylujemy go selektorem potomka */
+.karta h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--tekst);
+}
+
+.karta h3 svg {
+    color: var(--akcent-tekst);
+}
+
+.pole {
+    flex: 1;
+    min-height: 140px;
+    resize: none;
+    background-color: var(--karta-2);
+    color: var(--tekst);
+    border: 1px solid var(--ramka-mocna);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    box-sizing: border-box;
+    transition: border-color 0.15s, box-shadow 0.15s, background-color 0.25s;
+}
+
+.pole::placeholder {
+    color: var(--tekst-3);
+}
+
+.pole:focus {
+    outline: none;
+    border-color: var(--akcent);
+    box-shadow: 0 0 0 3px var(--akcent-tlo);
+}
+
+.blad {
+    margin: 0;
+    padding: 8px 12px;
+    background-color: var(--niebezpieczny-tlo);
+    color: var(--niebezpieczny);
+    border: 1px solid var(--niebezpieczny);
+    border-radius: 10px;
+    font-size: 0.88rem;
+}
+
+.pasek {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.podpowiedz, .niezapisane, .zapisane {
+    font-size: 0.8rem;
+}
+
+.podpowiedz {
+    color: var(--tekst-3);
+}
+
+.niezapisane {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--st-diagnoza);
+    font-weight: 600;
+}
+
+.niezapisane::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--st-diagnoza);
+}
+
+.zapisane {
+    color: var(--st-gotowe);
+    font-weight: 600;
+}
+
+.akcje {
+    display: flex;
+    gap: 8px;
+}
+
+.przycisk, .przyciskDrugi {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.2s ease, border-color 0.2s;
+}
+
+.przycisk {
+    background: var(--akcent-gradient);
+    color: #ffffff;
+    border: none;
+    box-shadow: var(--akcent-poswiata);
+}
+
+.przycisk:hover:not(:disabled) {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.przyciskDrugi {
+    background-color: var(--karta);
+    color: var(--tekst);
+    border: 1px solid var(--ramka-mocna);
+}
+
+.przyciskDrugi:hover:not(:disabled) {
+    border-color: var(--akcent);
+}
+
+.przycisk:disabled, .przyciskDrugi:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+@media (max-width: 1100px) {
+    .karta {
+        flex: none;
+    }
+
+    .pole {
+        flex: none;
+        min-height: 180px;
+    }
+}

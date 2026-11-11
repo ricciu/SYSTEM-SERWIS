@@ -1,6 +1,8 @@
 import { useParams, useNavigate, NavLink, Outlet } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import styles from './SzczegolyNapraw.module.css';
+import { FiChevronLeft, FiClipboard, FiCreditCard, FiPhone, FiRefreshCw } from "react-icons/fi";
+import { naglowkiApi } from "../tools/api";
 
 function klasaStatusu(status) {
     switch(status) {
@@ -27,6 +29,8 @@ export default function SzczegolyNaprawy() {
     const [czyStatusOtwarty, setCzyStatusOtwarty] = useState(false);
     const [wybranyRecznyStatus, setWybranyRecznieStatus] = useState(""); 
     const [historia, setHistoria] = useState([]);
+    // niezapisana wersja opisu prac: trzymana tutaj, żeby przełączenie zakładek jej nie gubiło
+    const [szkicOpisu, setSzkicOpisu] = useState(null);
     useEffect(() => {
     const pobierzDane = async () => {
         try {
@@ -73,11 +77,12 @@ async function potwierdzStatus(wybranyStatus) {
     try {
         const odpowiedz = await fetch(`http://localhost:3000/naprawy/${id}`, {
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
+            headers: naglowkiApi(),
             body: JSON.stringify({status: wybranyStatus})
     });
     if (odpowiedz.ok) {
-        setSzczegoly({...szczegoly, status: wybranyStatus})
+        setSzczegoly({...szczegoly, status: wybranyStatus});
+        pobierzHistorie();
     };
     setCzyStatusOtwarty(false);
     setWybranyRecznieStatus("");
@@ -96,33 +101,32 @@ const nastepny_krok = (obecny_indeks < kroki_naprawy.length - 1 ? kroki_naprawy[
     return (
        <div className={styles.szczegolyNaprawy}>
             <header className={styles.infoNaprawa}>
-    <div className={styles.status}>
-        <span className={styles.id}>RIC-{szczegoly.id}</span>
-        <span className={`${styles.pigulkaStatusu} ${klasaStatusu(szczegoly.status)}`}>{szczegoly.status}</span>
-        <button className={styles.btnZamknij} onClick={() => nawiguj('/naprawy')}>X</button>
+    <button className={styles.btnPowrot} onClick={() => nawiguj('/naprawy')}>
+        <FiChevronLeft /> Naprawy
+    </button>
+    <div className={styles.daneSprzetu}>
+        <h1>{szczegoly.nazwa_sprzetu}</h1>
+        <p>RIC-{szczegoly.id} · {szczegoly.imie_nazwisko}</p>
     </div>
-    <div className={styles.glownaSekcjaNaglowka}>
-        <div className={styles.daneSprzetu}>
-            <h1>{szczegoly.nazwa_sprzetu}</h1>
-            <p>{szczegoly.opis_usterki}</p>
-        </div>
-        <div className={styles.wielkaKwotaDoZaplaty}>
-            <span className={styles.etykietaWielkaKwota}>Do zapłaty</span>
-            <strong>{sumaKosztow.toFixed(2).replace('.', ',')} zł</strong>
-        </div>
+    <span className={`${styles.pigulkaStatusu} ${klasaStatusu(szczegoly.status)}`}>{szczegoly.status}</span>
+    <div className={styles.wielkaKwotaDoZaplaty}>
+        <span className={styles.etykietaWielkaKwota}>Do zapłaty</span>
+        <strong>{sumaKosztow.toFixed(2).replace('.', ',')} zł</strong>
     </div>
 </header>
 <nav className={styles.zakladki}>
-    <NavLink to="." end className={({isActive})=>isActive ? styles.zakladkaAktywna : styles.zakladka}>Przegląd</NavLink>
-    <NavLink to="kosztorys" className={({isActive})=> isActive ? styles.zakladkaAktywna : styles.zakladka}>Kosztorys</NavLink>
+    <NavLink to="." end className={({isActive})=>isActive ? styles.zakladkaAktywna : styles.zakladka}><FiClipboard /> Przegląd</NavLink>
+    <NavLink to="kosztorys" className={({isActive})=> isActive ? styles.zakladkaAktywna : styles.zakladka}>
+        <FiCreditCard /> Kosztorys <span className={styles.licznik}>{dodaneKoszty.length}</span>
+    </NavLink>
 </nav>
 
             <section className={styles.obszarRoboczy}>
-              <Outlet context={{szczegoly, dodaneKoszty, setDodaneKoszty, listaCzesci, historia, odswiezHistorie: pobierzHistorie}}/>
+              <Outlet context={{szczegoly, setSzczegoly, dodaneKoszty, setDodaneKoszty, listaCzesci, historia, odswiezHistorie: pobierzHistorie, szkicOpisu, setSzkicOpisu}}/>
             </section>
             <footer>
-                <button className={styles.kontaktKlient}>Kontakt z klientem</button>
-                <button className={styles.zmienStatus} onClick={()=>{setCzyStatusOtwarty(true)}}>Zmień status</button>
+                <button className={styles.kontaktKlient}><FiPhone /> Kontakt z klientem</button>
+                <button className={styles.zmienStatus} onClick={()=>{setCzyStatusOtwarty(true)}}><FiRefreshCw /> Zmień status</button>
             </footer>
             
             {czyStatusOtwarty  && (
